@@ -1,0 +1,1486 @@
+/* ProseMirror Editor Styles */
+
+.prose-mirror-editor {
+  outline: none !important;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  cursor: text !important;
+  min-height: 200px;
+  position: relative;
+  background: transparent;
+  color: inherit;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  pointer-events: auto !important;
+}
+
+.prose-mirror-editor:hover {
+  background-color: transparent;
+}
+
+.prose-mirror-editor:focus,
+.prose-mirror-editor:focus-within {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* Ensure the editor is always interactive */
+.prose-mirror-editor[contenteditable="true"] {
+  cursor: text !important;
+  pointer-events: auto !important;
+}
+
+.prose-mirror-editor[contenteditable="false"] {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Improved cursor visibility */
+.prose-mirror-editor {
+  caret-color: #1f2937 !important;
+}
+
+/* Better selection visibility for dark theme */
+.prose-mirror-editor ::selection {
+  background-color: rgba(59, 130, 246, 0.25);
+  color: #0f172a;
+}
+
+/* Hover effects for better UX */
+.prose-mirror-editor:hover {
+  box-shadow: none;
+}
+
+/* Active editing state */
+.prose-mirror-editor:focus,
+.prose-mirror-editor:focus-within {
+  box-shadow: none;
+}
+
+/* Placeholder styling when empty */
+.prose-mirror-editor:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(15, 23, 42, 0.35);
+  pointer-events: none;
+  position: absolute;
+  font-style: italic;
+}
+
+/* Ensure paragraphs have proper spacing */
+.prose-mirror-editor p:first-child {
+  margin-top: 0;
+}
+
+.prose-mirror-editor p:last-child {
+  margin-bottom: 0;
+}
+
+/* Better visual feedback for editable areas in dark theme */
+.prose-mirror-editor p:hover,
+.prose-mirror-editor h1:hover,
+.prose-mirror-editor h2:hover,
+.prose-mirror-editor h3:hover,
+.prose-mirror-editor li:hover {
+  background-color: transparent;
+}
+
+.prose-mirror-editor p {
+  margin: 0 0 8px 0;
+  line-height: 1.6;
+  color: inherit;
+}
+
+.prose-mirror-editor h1,
+.prose-mirror-editor h2,
+.prose-mirror-editor h3,
+.prose-mirror-editor h4,
+.prose-mirror-editor h5,
+.prose-mirror-editor h6 {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #0f172a;
+}
+
+.prose-mirror-editor h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.prose-mirror-editor h2 {
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.prose-mirror-editor h3 {
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.prose-mirror-editor ul,
+.prose-mirror-editor ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.prose-mirror-editor li {
+  margin: 4px 0;
+  line-height: 1.6;
+}
+
+.prose-mirror-editor strong {
+  font-weight: 600;
+}
+
+.prose-mirror-editor em {
+  font-style: italic;
+}
+
+.prose-mirror-editor u {
+  text-decoration: underline;
+}
+
+.prose-mirror-editor s {
+  text-decoration: line-through;
+}
+
+/* Font size and line height support */
+.prose-mirror-editor span[style*="font-size"] {
+  /* 确保字号样式生效 */
+  display: inline !important;
+}
+
+.prose-mirror-editor .custom-text-style {
+  /* 自定义文本样式支持 */
+}
+
+.prose-mirror-editor p[style*="line-height"],
+.prose-mirror-editor h1[style*="line-height"],
+.prose-mirror-editor h2[style*="line-height"],
+.prose-mirror-editor h3[style*="line-height"] {
+  /* 确保行高样式生效 */
+}
+
+/* 列表样式 */
+.prose-mirror-editor .tiptap-ordered-list {
+  list-style-type: decimal;
+  padding-left: 24px;
+  margin: 8px 0;
+}
+
+.prose-mirror-editor .tiptap-bullet-list {
+  list-style-type: disc;
+  padding-left: 24px;
+  margin: 8px 0;
+}
+
+.prose-mirror-editor .tiptap-ordered-list li,
+.prose-mirror-editor .tiptap-bullet-list li {
+  margin: 4px 0;
+  line-height: 1.6;
+}
+
+/* 嵌套列表样式 */
+.prose-mirror-editor .tiptap-bullet-list .tiptap-bullet-list {
+  list-style-type: circle;
+}
+
+.prose-mirror-editor .tiptap-bullet-list .tiptap-bullet-list .tiptap-bullet-list {
+  list-style-type: square;
+}
+
+.prose-mirror-editor .tiptap-ordered-list .tiptap-ordered-list {
+  list-style-type: lower-alpha;
+}
+
+.prose-mirror-editor .tiptap-ordered-list .tiptap-ordered-list .tiptap-ordered-list {
+  list-style-type: lower-roman;
+}
+
+/* Text alignment */
+.prose-mirror-editor p[style*="text-align: center"],
+.prose-mirror-editor h1[style*="text-align: center"],
+.prose-mirror-editor h2[style*="text-align: center"],
+.prose-mirror-editor h3[style*="text-align: center"] {
+  text-align: center;
+}
+
+.prose-mirror-editor p[style*="text-align: right"],
+.prose-mirror-editor h1[style*="text-align: right"],
+.prose-mirror-editor h2[style*="text-align: right"],
+.prose-mirror-editor h3[style*="text-align: right"] {
+  text-align: right;
+}
+
+.prose-mirror-editor p[style*="text-align: justify"],
+.prose-mirror-editor h1[style*="text-align: justify"],
+.prose-mirror-editor h2[style*="text-align: justify"],
+.prose-mirror-editor h3[style*="text-align: justify"] {
+  text-align: justify;
+}
+
+.prose-mirror-editor mark {
+  background-color: #fef08a;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* Page break styling */
+.prose-mirror-editor .page-break {
+  page-break-after: always;
+  height: 0;
+  border: none;
+  margin: 16px 0;
+  padding: 0;
+  position: relative;
+  display: block;
+}
+
+.prose-mirror-editor .page-break::before {
+  content: '--- 分页符 ---';
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  transform: translateX(-50%);
+  background: white;
+  padding: 0 8px;
+  font-size: 10px;
+  color: #9ca3af;
+  border: 1px dashed #d1d5db;
+  border-radius: 4px;
+}
+
+.prose-mirror-editor .page-break[data-type="automatic"]::before {
+  content: '--- 自动分页 ---';
+  color: #059669;
+  border-color: #10b981;
+}
+
+/* Page container styling */
+.page-container {
+  position: relative;
+  margin: 0 auto 32px auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.page-container:last-child {
+  margin-bottom: 0;
+}
+
+/* Seamless pagination styling */
+.seamless-paginated-editor {
+  position: relative;
+}
+
+.seamless-page-container {
+  position: relative;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  min-height: auto !important;
+}
+
+.seamless-content {
+  position: relative;
+  min-height: 200px;
+}
+
+/* Auto page breaks for seamless pagination */
+.seamless-content .auto-page-break {
+  height: 1px;
+  background: transparent;
+  margin: 20px 0;
+  position: relative;
+}
+
+.seamless-content .auto-page-break::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e5e7eb 20%, #e5e7eb 80%, transparent);
+}
+
+/* Page status and controls */
+.page-status-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(249, 250, 251, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.pagination-controls {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: rgba(249, 250, 251, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+/* Page header and footer */
+.page-header,
+.page-footer {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  user-select: none;
+}
+
+.page-header {
+  margin-bottom: 16px;
+}
+
+.page-footer {
+  margin-top: 16px;
+}
+
+/* Company section styling */
+.prose-mirror-editor .company-section {
+  border-left: 3px solid #0ea5e9;
+  padding-left: 16px;
+  margin: 16px 0;
+  background-color: #f0f9ff;
+  border-radius: 4px;
+  padding: 12px 16px;
+}
+
+.prose-mirror-editor .company-section[data-visible="false"] {
+  display: none;
+}
+
+/* Selection styling */
+.prose-mirror-editor ::selection {
+  background-color: rgba(59, 130, 246, 0.25);
+  color: #0f172a;
+}
+
+/* Focus styling */
+.prose-mirror-editor:focus {
+  outline: none;
+}
+
+/* Placeholder styling */
+.prose-mirror-editor .ProseMirror-placeholder {
+  color: #9ca3af;
+  pointer-events: none;
+  height: 0;
+  display: inline-block;
+}
+
+.prose-mirror-editor .ProseMirror-placeholder::before {
+  content: attr(data-placeholder);
+}
+
+/* Ensure proper spacing in empty paragraphs */
+.prose-mirror-editor p:empty::before {
+  content: '\00a0';
+  color: transparent;
+}
+
+/* Print styles */
+@media print {
+  .prose-mirror-editor {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  .prose-mirror-editor .page-break {
+    page-break-after: always;
+    height: 0;
+    margin: 0;
+    border: none;
+  }
+
+  .prose-mirror-editor .page-break::before {
+    display: none;
+  }
+
+  .prose-mirror-editor .company-section {
+    background-color: transparent;
+    border-left: 2pt solid #000;
+  }
+
+  /* Hide UI elements in print */
+  .page-status-bar,
+  .pagination-controls,
+  .formatting-toolbar {
+    display: none !important;
+  }
+
+  /* Ensure proper page margins */
+  .page-container {
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+
+  .page-container:last-child {
+    page-break-after: auto;
+  }
+
+  /* Page headers and footers for print */
+  .page-header,
+  .page-footer {
+    font-size: 10pt;
+    color: #000;
+  }
+
+  /* Ensure content doesn't break across pages inappropriately */
+  .prose-mirror-editor h1,
+  .prose-mirror-editor h2,
+  .prose-mirror-editor h3 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  .prose-mirror-editor p {
+    orphans: 2;
+    widows: 2;
+  }
+
+  .prose-mirror-editor ul,
+  .prose-mirror-editor ol {
+    page-break-inside: avoid;
+  }
+}
+
+/* Selection Toolbar Styles - Feishu-like floating toolbar */
+.selection-toolbar {
+  font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  /* 确保工具栏可以接收焦点和鼠标事件 */
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+}
+
+.selection-toolbar .toolbar-section {
+  position: relative;
+}
+
+.selection-toolbar .toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.08);
+  margin: 0;
+}
+
+.selection-toolbar button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+  position: relative;
+}
+
+.selection-toolbar button:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+.selection-toolbar button:active {
+  transform: translateY(0);
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.selection-toolbar .ai-button {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.selection-toolbar .ai-button:hover {
+  background-color: rgba(24, 144, 255, 0.08);
+}
+
+.selection-toolbar .format-button {
+  width: 32px;
+  height: 32px;
+  color: #262626;
+}
+
+.selection-toolbar .format-button.active {
+  background-color: rgba(24, 144, 255, 0.1);
+  color: #1890ff;
+}
+
+.selection-toolbar .color-button {
+  background-color: #fadb14;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+  color: #262626;
+}
+
+.selection-toolbar .color-button:hover {
+  background-color: #ffd666;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Dropdown menus */
+.selection-toolbar .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  min-width: 120px;
+  overflow: visible;
+  animation: dropdown-enter 0.15s ease-out;
+}
+
+.selection-toolbar .dropdown-menu.dropdown-submenu {
+  top: 0;
+  left: calc(100% + 12px);
+  margin-top: 0;
+}
+
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.selection-toolbar .dropdown-menu button {
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  border-radius: 0;
+  font-size: 14px;
+  color: #262626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.selection-toolbar .dropdown-menu button:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: none;
+}
+
+.selection-toolbar .dropdown-menu button:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.selection-toolbar .dropdown-menu button:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Color picker styles */
+.color-picker-panel {
+  width: 280px;
+  padding: 16px;
+}
+
+.color-picker-panel.right-0 {
+  right: 0;
+  left: auto;
+}
+
+.color-picker-section {
+  margin-bottom: 16px;
+}
+
+.color-picker-section:last-child {
+  margin-bottom: 0;
+}
+
+.color-picker-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.color-option {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  position: relative;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.color-option.transparent {
+  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+    linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+}
+
+/* Animation for toolbar appearance */
+.selection-toolbar {
+  animation: toolbar-enter 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes toolbar-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .selection-toolbar {
+    max-width: calc(100vw - 24px);
+    overflow-x: auto;
+  }
+
+  .selection-toolbar .toolbar-section {
+    flex-shrink: 0;
+  }
+
+  .color-picker-panel {
+    width: 240px;
+    padding: 12px;
+  }
+
+  .color-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .color-option {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* 清华大学简历模板样
+式 */
+.tsinghua-resume {
+  font-family: 'Microsoft YaHei', 'SimSun', serif;
+  line-height: 1.6;
+}
+
+.tsinghua-resume .section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 2px solid #000;
+  padding-bottom: 2px;
+  margin-bottom: 12px;
+}
+
+.tsinghua-resume .project-item {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.tsinghua-resume .project-item:last-child {
+  border-bottom: none;
+}
+
+.tsinghua-resume .project-item h4 {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #000;
+}
+
+.tsinghua-resume .time-period {
+  font-size: 12px;
+  color: #666;
+  float: right;
+  margin-top: -20px;
+}
+
+.tsinghua-resume .project-item p {
+  font-size: 12px;
+  margin: 4px 0;
+  text-align: justify;
+}
+
+.tsinghua-resume .project-item strong {
+  font-weight: bold;
+}
+
+/* 教育背景网格布局 */
+.education-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.education-item {
+  font-size: 12px;
+}
+
+.education-item .label {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+/* 表格样式 */
+.resume-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.resume-table td {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  vertical-align: top;
+}
+
+.resume-table .header-cell {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* 技能标签样式 */
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.skill-tag {
+  background-color: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: #333;
+}
+
+/* 奖项列表样式 */
+.awards-list {
+  list-style: none;
+  padding: 0;
+}
+
+.awards-list li {
+  margin-bottom: 4px;
+  font-size: 12px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.awards-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #666;
+}
+
+.editor-surface {
+  position: relative;
+}
+
+.empty-line-toolbar {
+  position: absolute;
+  z-index: 40;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+  width: 100%;
+}
+
+.empty-line-highlight-bar {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px dashed rgba(14, 165, 233, 0.35);
+  background: rgba(14, 165, 233, 0.08);
+  pointer-events: none;
+}
+
+.empty-line-actions {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.empty-line-plus {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #fff;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.empty-line-plus:hover,
+.empty-line-plus.active {
+  transform: translateY(-1px);
+  border-color: rgba(14, 165, 233, 0.6);
+  box-shadow: 0 16px 32px rgba(14, 165, 233, 0.28);
+}
+
+.empty-line-quick-menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.18);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-6px) scale(0.95);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.empty-line-quick-menu.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0) scale(1);
+}
+
+.empty-line-menu-item {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #f8fafc;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.empty-line-menu-item:hover {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.6);
+  color: #0284c7;
+  transform: translateY(-1px);
+}
+
+.empty-line-menu {
+  position: absolute;
+  right: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 260px;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.28);
+  padding: 16px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 50;
+}
+
+/* 简化版菜单 - 两个图标按钮 */
+.empty-line-menu-simple {
+  position: absolute;
+  right: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.25);
+  padding: 8px;
+  pointer-events: auto;
+  display: flex;
+  gap: 8px;
+  z-index: 50;
+  animation: menu-appear 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes menu-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.empty-line-icon-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.empty-line-icon-button:hover {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  border-color: rgba(14, 165, 233, 0.6);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35);
+}
+
+.empty-line-icon-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.empty-line-menu-section {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.empty-line-menu-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.empty-line-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.empty-line-menu-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: rgba(14, 165, 233, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0ea5e9;
+}
+
+.empty-line-menu-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.empty-line-menu-hint {
+  font-size: 12px;
+  color: rgba(15, 23, 42, 0.5);
+}
+
+.divider-color-preview {
+  margin-left: auto;
+  width: 32px;
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+.divider-color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.divider-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.divider-color-swatch.active {
+  border-color: rgba(14, 165, 233, 0.8);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25);
+}
+
+.divider-color-swatch:hover {
+  transform: translateY(-1px);
+}
+
+.divider-color-picker {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px dashed rgba(148, 163, 184, 0.8);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(15, 23, 42, 0.6);
+  position: relative;
+  cursor: pointer;
+}
+
+.divider-color-picker input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.empty-line-menu-action {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(14, 165, 233, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.empty-line-menu-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(14, 165, 233, 0.4);
+}
+
+.empty-line-image-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty-line-image-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.03);
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.empty-line-image-actions button:hover {
+  border-color: rgba(14, 165, 233, 0.35);
+  background: rgba(14, 165, 233, 0.12);
+  transform: translateX(2px);
+}
+
+.ProseMirror p.empty-line-highlight {
+  background: rgba(14, 165, 233, 0.06);
+  border-radius: 8px;
+}
+
+.resizable-image-node {
+  position: absolute;
+  z-index: 10;
+  transition: box-shadow 0.2s ease;
+}
+
+.resizable-image-node.is-dragging {
+  z-index: 100;
+  cursor: grabbing !important;
+}
+
+.resizable-image-node.is-dragging .resizable-image-frame {
+  box-shadow: 0 20px 60px rgba(14, 165, 233, 0.4);
+}
+
+.resizable-image-frame {
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #fff;
+  display: inline-block;
+}
+
+.resizable-image-node.is-active .resizable-image-frame,
+.resizable-image-frame.is-hovered {
+  border-color: rgba(14, 165, 233, 0.65);
+  box-shadow: 0 24px 48px rgba(14, 165, 233, 0.35);
+}
+
+.resizable-image-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  position: relative;
+}
+
+.resizable-image-canvas img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+  transition: transform 0.15s ease;
+}
+
+.resizable-image-canvas:active {
+  cursor: grabbing;
+}
+
+.resizable-image-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #0ea5e9;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+  cursor: pointer;
+}
+
+.resizable-image-handle--left {
+  left: -7px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.resizable-image-handle--right {
+  right: -7px;
+  top: 50%;
+  transform: translate(50%, -50%);
+}
+
+.resizable-image-handle--top-left {
+  left: 14px;
+  top: 14px;
+}
+
+.resizable-image-handle--top-right {
+  right: 14px;
+  top: 14px;
+}
+
+.resizable-image-handle--bottom-left {
+  left: 14px;
+  bottom: 14px;
+}
+
+.resizable-image-handle--bottom-right {
+  right: 14px;
+  bottom: 14px;
+}
+
+.resizable-image-toolbar {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.4);
+}
+
+.resizable-image-toolbar button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.resizable-image-toolbar button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.resizable-image-toolbar button.drag-handle-btn {
+  cursor: grab;
+}
+
+.resizable-image-toolbar button.drag-handle-btn:active {
+  cursor: grabbing;
+}
+
+.resizable-image-toolbar button.drag-handle-btn:hover {
+  background: rgba(14, 165, 233, 0.2);
+}
+
+.resizable-image-output {
+  margin: 32px auto;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+}
+
+/* 确保编辑器容器支持绝对定位的图片 */
+.prose-mirror-editor {
+  position: relative;
+}
+
+/* 可交互分割线样式 */
+.colored-divider-wrapper {
+  margin: 0;
+  padding: 0;
+  cursor: move;
+  position: relative;
+  transition: transform 0.15s ease;
+  line-height: 0;
+  display: block;
+  width: 100%;
+  height: 28px;
+  box-sizing: border-box;
+}
+
+.colored-divider-wrapper::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 28px;
+  transform: translateY(-50%);
+  border-radius: 8px;
+  border: 1px dashed rgba(14, 165, 233, 0.35);
+  background: rgba(14, 165, 233, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.colored-divider-wrapper:hover::after,
+.colored-divider-wrapper.is-selected::after {
+  opacity: 1;
+}
+
+.colored-divider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  height: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+.colored-divider-line {
+  border: none;
+  border-top-style: solid;
+  margin: 0;
+  transition: all 0.2s ease;
+  display: block;
+  height: 0;
+}
+
+.colored-divider-toolbar {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+  z-index: 10;
+  animation: divider-toolbar-appear 0.2s ease;
+}
+
+@keyframes divider-toolbar-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.divider-tool-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f8fafc;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.divider-tool-btn:hover {
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.3);
+  color: #0284c7;
+  transform: translateY(-1px);
+}
+
+.divider-tool-btn:active {
+  transform: translateY(0);
+}
+
+.divider-control-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.divider-control-group:first-child {
+  border-left: none;
+}
+
+.divider-control-group:last-child {
+  border-right: none;
+}
+
+.divider-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  min-width: 36px;
+  text-align: center;
+}
+
+.divider-color-palette {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.2);
+  z-index: 20;
+  animation: palette-appear 0.2s ease;
+}
+
+@keyframes palette-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.color-preset {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.color-preset:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.color-preset.active {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25);
+}
+
+.color-custom {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px dashed rgba(15, 23, 42, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.color-custom:hover {
+  border-color: #0ea5e9;
+  color: #0ea5e9;
+  transform: scale(1.15);
+}
+
+.color-custom input[type="color"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}

@@ -1,0 +1,18 @@
+{
+  "name": "resume-copilot",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.7.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter @resume-copilot/web dev",
+    "dev:api": "pnpm --filter @resume-copilot/api start:dev",
+    "lint": "pnpm -r lint",
+    "build": "pnpm -r build"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2"
+  }
+}

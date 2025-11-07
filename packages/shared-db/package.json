@@ -1,0 +1,21 @@
+﻿{
+  "name": "@resume-copilot/shared-db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "Database schema utilities and connectors",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
+    "lint": "eslint \"src/**/*.{ts,tsx}\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "kysely": "^0.27.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

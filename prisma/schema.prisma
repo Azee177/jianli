@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  resumes Resume[]
+  jds     JD[]
+  tasks   Task[]
+
+  @@map("users")
+}
+
+model Resume {
+  id           String   @id @default(cuid())
+  userId       String
+  rawText      String   @map("raw_text")
+  skills       String[]
+  contactsJson String   @default("{}") @map("contacts_json")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  @@map("resumes")
+}
+
+model JD {
+  id              String   @id @default(cuid())
+  userId          String
+  company         String
+  title           String
+  jdText          String   @map("jd_text")
+  mustHaveSkills  String[] @map("must_have_skills")
+  niceToHave      String[] @map("nice_to_have")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  @@map("jds")
+}
+
+model Output {
+  id                 String @id @default(cuid())
+  resumeMd           String @map("resume_md")
+  interviewQuestions String[] @map("interview_questions")
+  knowledgeJson      String @map("knowledge_json") // JSON.stringify(KnowledgeItem[])
+  createdAt          DateTime @default(now())
+
+  // Relations
+  task Task?
+
+  @@map("outputs")
+}
+
+model Task {
+  id        String      @id @default(cuid())
+  userId    String
+  resumeId  String      @map("resume_id")
+  jdId      String      @map("jd_id")
+  status    TaskStatus
+  cost      Float?
+  latencyMs Int?        @map("latency_ms")
+  outputId  String?     @unique @map("output_id")
+  error     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume Resume  @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jd     JD      @relation(fields: [jdId], references: [id], onDelete: Cascade)
+  output Output? @relation(fields: [outputId], references: [id])
+
+  @@map("tasks")
+}
+
+enum TaskStatus {
+  QUEUED
+  RUNNING
+  DONE
+  ERROR
+
+  @@map("task_status")
+}
+
+// 扩展表：用于存储用户的工作流配置
+model WorkflowConfig {
+  id       String @id @default(cuid())
+  userId   String @unique
+  settings Json   @default("{}")
+
+  @@map("workflow_configs")
+}
+
+// 扩展表：用于存储LLM调用日志
+model LLMCall {
+  id          String   @id @default(cuid())
+  taskId      String?  @map("task_id")
+  provider    String   // "qwen", "deepseek", "gpt"
+  model       String
+  tokensIn    Int      @map("tokens_in")
+  tokensOut   Int      @map("tokens_out")
+  cost        Float
+  latencyMs   Int      @map("latency_ms")
+  success     Boolean  @default(true)
+  error       String?
+  createdAt   DateTime @default(now())
+
+  @@map("llm_calls")
+}
+
+// 扩展表：用于存储用户反馈
+model Feedback {
+  id        String      @id @default(cuid())
+  userId    String
+  taskId    String?     @map("task_id")
+  type      FeedbackType
+  rating    Int?        // 1-5 stars
+  comment   String?
+  createdAt DateTime    @default(now())
+
+  @@map("feedback")
+}
+
+enum FeedbackType {
+  RESUME_QUALITY
+  INTERVIEW_QUESTIONS
+  KNOWLEDGE_ITEMS
+  OVERALL_EXPERIENCE
+
+  @@map("feedback_type")
+}

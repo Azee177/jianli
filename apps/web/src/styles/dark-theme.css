@@ -1,0 +1,355 @@
+/* Dark Theme Resume Styles - Based on Reference Design */
+
+.dark-theme-resume {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+  color: #ffffff;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+/* Header Section */
+.dark-theme-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 32px;
+}
+
+.dark-theme-profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.dark-theme-name-section {
+  flex: 1;
+}
+
+.dark-theme-hello {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+.dark-theme-name {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 300;
+  color: #ffffff;
+  margin: 0 0 16px 0;
+}
+
+.dark-theme-contact-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  color: #e0e0e0;
+}
+
+.dark-theme-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dark-theme-contact-item::before {
+  content: "●";
+  color: #4a9eff;
+  font-size: 8px;
+}
+
+.dark-theme-contact-item:first-child::before {
+  display: none;
+}
+
+/* Section Styling */
+.dark-theme-section {
+  margin-bottom: 32px;
+  padding: 0 32px;
+}
+
+.dark-theme-section-title {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dark-theme-section-content {
+  color: #e0e0e0;
+  line-height: 1.6;
+}
+
+.dark-theme-divider {
+  height: 1px;
+  background-color: #ffffff;
+  margin: 32px 32px;
+}
+
+/* Experience Items */
+.dark-theme-experience-item {
+  margin-bottom: 24px;
+}
+
+.dark-theme-experience-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.dark-theme-company {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.dark-theme-position {
+  color: #e0e0e0;
+  margin-left: 8px;
+  font-size: 14px;
+}
+
+.dark-theme-date {
+  color: #b0b0b0;
+  font-size: 12px;
+}
+
+.dark-theme-description {
+  color: #e0e0e0;
+  margin-top: 8px;
+}
+
+.dark-theme-description ul {
+  margin: 8px 0;
+  padding-left: 16px;
+}
+
+.dark-theme-description li {
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.dark-theme-description li::marker {
+  color: #4a9eff;
+}
+
+/* Education Section */
+.dark-theme-education-item {
+  margin-bottom: 16px;
+}
+
+.dark-theme-school {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.dark-theme-degree {
+  color: #e0e0e0;
+  margin-left: 8px;
+}
+
+.dark-theme-education-date {
+  color: #b0b0b0;
+  font-size: 12px;
+  float: right;
+}
+
+.dark-theme-education-details {
+  color: #e0e0e0;
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+/* Skills and Other Sections */
+.dark-theme-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dark-theme-skill-item {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Self-evaluation section */
+.dark-theme-evaluation {
+  color: #e0e0e0;
+}
+
+.dark-theme-evaluation ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.dark-theme-evaluation li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dark-theme-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    padding: 24px 16px;
+  }
+  
+  .dark-theme-hello {
+    font-size: 36px;
+  }
+  
+  .dark-theme-name {
+    font-size: 24px;
+  }
+  
+  .dark-theme-section {
+    padding: 0 16px;
+  }
+  
+  .dark-theme-divider {
+    margin: 24px 16px;
+  }
+  
+  .dark-theme-experience-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .dark-theme-contact-info {
+    justify-content: center;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .dark-theme-resume {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .dark-theme-hello,
+  .dark-theme-name,
+  .dark-theme-section-title,
+  .dark-theme-company {
+    color: #000000 !important;
+  }
+  
+  .dark-theme-contact-info,
+  .dark-theme-section-content,
+  .dark-theme-description,
+  .dark-theme-position {
+    color: #333333 !important;
+  }
+  
+  .dark-theme-date,
+  .dark-theme-education-date {
+    color: #666666 !important;
+  }
+  
+  .dark-theme-divider,
+  .dark-theme-section-title {
+    border-color: #000000 !important;
+  }
+  
+  .dark-theme-profile-image {
+    border-color: #cccccc !important;
+  }
+  
+  .dark-theme-skill-item {
+    background: #f0f0f0 !important;
+    color: #000000 !important;
+    border-color: #cccccc !important;
+  }
+}
+
+/* Animation and Transitions */
+.dark-theme-resume * {
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Smooth page transitions */
+.seamless-paginated-editor {
+  transition: all 0.3s ease;
+}
+
+.seamless-page-container {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.seamless-page-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover Effects for Interactive Elements */
+.dark-theme-resume a {
+  color: #4a9eff;
+  text-decoration: none;
+}
+
+.dark-theme-resume a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Focus States for Accessibility */
+.dark-theme-resume *:focus {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .dark-theme-resume {
+    background: #000000 !important;
+  }
+  
+  .dark-theme-hello,
+  .dark-theme-name,
+  .dark-theme-section-title {
+    color: #ffffff !important;
+  }
+  
+  .dark-theme-divider,
+  .dark-theme-section-title {
+    border-color: #ffffff !important;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .dark-theme-resume * {
+    transition: none !important;
+  }
+}

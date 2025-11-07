@@ -1,0 +1,240 @@
+﻿/* 涓夋爮甯冨眬鏍峰紡 */
+.three-column-layout {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 闈㈡澘璋冩暣鎵嬫焺鏍峰紡 */
+.resize-handle {
+  position: relative;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.resize-handle:hover {
+  background: rgba(14, 165, 233, 0.2);
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 20px;
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.resize-handle:hover::after {
+  opacity: 1;
+}
+
+/* A4 绠€鍘嗘牱寮?*/
+.resume-a4 {
+  width: 794px; /* A4 width at 96 DPI */
+  min-height: 1123px; /* A4 height at 96 DPI */
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin: 0 auto;
+  position: relative;
+}
+
+.resume-a4-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100%;
+  padding: 2rem;
+  background: #1e293b;
+}
+
+/* 鍝嶅簲寮忕缉鏀?*/
+@media (max-width: 1200px) {
+  .resume-a4 {
+    transform: scale(0.8);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 1000px) {
+  .resume-a4 {
+    transform: scale(0.7);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 800px) {
+  .resume-a4 {
+    transform: scale(0.6);
+    transform-origin: top center;
+  }
+}
+
+/* 鎵撳嵃鏍峰紡 */
+@media print {
+  .resume-a4 {
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+  
+  .resume-a4-container {
+    padding: 0 !important;
+    background: white !important;
+  }
+  
+  body {
+    background: white !important;
+  }
+}
+
+/* 闈㈡澘鍔ㄧ敾 */
+.panel-enter {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.panel-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+.panel-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.panel-exit-active {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: transform 300ms ease-in, opacity 300ms ease-in;
+}
+
+/* 鍙充晶闈㈡澘鍔ㄧ敾 */
+.right-panel-enter {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.right-panel-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+.right-panel-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.right-panel-exit-active {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 300ms ease-in, opacity 300ms ease-in;
+}
+
+/* 婊氬姩鏉℃牱寮?*/
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(94, 234, 212, 0.45) rgba(15, 23, 42, 0.4);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.55);
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(20, 184, 166, 0.8), rgba(14, 165, 233, 0.85));
+  border-radius: 9999px;
+  border: 1px solid rgba(13, 23, 42, 0.9);
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.9), rgba(99, 102, 241, 0.95));
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+}
+
+/* 閫変腑鏂囨湰鏍峰紡 */
+::selection {
+  background: rgba(14, 165, 233, 0.3);
+  color: inherit;
+}
+
+/* 缂栬緫鍣ㄧ劍鐐规牱寮?*/
+.resume-editor:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.5);
+  outline-offset: 2px;
+}
+
+/* 宸ュ叿鎻愮ず鏍峰紡 */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+.resume-editor-fullpage {
+  width: 100%;
+  height: 100%;
+}
+
+.resume-editor-fullpage .ProseMirror {
+  outline: none;
+  min-height: 297mm;
+  padding: 60px 66px 72px;
+  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #111827;
+  background: transparent;
+}
+
+.resume-editor-fullpage .ProseMirror:focus {
+  box-shadow: none;
+}
+
+.resume-editor-fullpage .ProseMirror hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 32px 0;
+  cursor: default;
+}
+
+

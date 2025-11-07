@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Resume Copilot API
+  version: 0.1.0
+  description: Resume optimization and interview preparation platform
+servers:
+  - url: /api
+    description: Local development server
+paths:
+  /resumes:
+    post:
+      summary: 上传简历（PDF/Doc/纯文本）并解析为结构化字段
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 简历文件（PDF、Word等）
+                text:
+                  type: string
+                  description: 备用：若无文件，直接上传纯文本
+      responses:
+        '200':
+          description: 简历上传成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resume'
+        '400':
+          description: 请求参数错误
+        '500':
+          description: 服务器错误
+  /jds/parse:
+    post:
+      summary: 解析 JD（支持 URL 或原文）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url: 
+                  type: string
+                  description: JD页面URL
+                text: 
+                  type: string
+                  description: JD原文内容
+      responses:
+        '200':
+          description: JD解析成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JD'
+        '400':
+          description: 请求参数错误
+        '500':
+          description: 服务器错误
+  /pipelines/run:
+    post:
+      summary: 运行主流程（简历×JD → 简历草稿 + 面试题 + 知识点）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resume_id, jd_id]
+              properties:
+                resume_id: 
+                  type: string
+                  description: 简历ID
+                jd_id: 
+                  type: string
+                  description: JD ID
+      responses:
+        '200':
+          description: 任务创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: 请求参数错误
+        '500':
+          description: 服务器错误
+  /tasks/{id}:
+    get:
+      summary: 轮询任务状态
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: string
+          description: 任务ID
+      responses:
+        '200':
+          description: 任务状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: 任务不存在
+        '500':
+          description: 服务器错误
+components:
+  schemas:
+    Resume:
+      type: object
+      required: [id, raw_text]
+      properties:
+        id: 
+          type: string
+          description: 简历唯一标识
+        raw_text: 
+          type: string
+          description: 原始简历文本
+        parsed_blocks:
+          type: array
+          description: 解析后的简历块
+          items:
+            type: object
+            properties:
+              type: 
+                type: string
+                enum: [header, education, experience, project, skills]
+                description: 块类型
+              text: 
+                type: string
+                description: 块内容
+        skills:
+          type: array
+          description: 提取的技能列表
+          items: 
+            type: string
+        contacts:
+          type: object
+          description: 联系方式
+          properties:
+            name: 
+              type: string
+              description: 姓名
+            email: 
+              type: string
+              description: 邮箱
+            phone: 
+              type: string
+              description: 电话
+    JD:
+      type: object
+      required: [id, company, title, jd_text]
+      properties:
+        id: 
+          type: string
+          description: JD唯一标识
+        company: 
+          type: string
+          description: 公司名称
+        title: 
+          type: string
+          description: 职位名称
+        jd_text: 
+          type: string
+          description: JD原文
+        must_have_skills:
+          type: array
+          description: 必备技能
+          items: 
+            type: string
+        nice_to_have:
+          type: array
+          description: 加分技能
+          items: 
+            type: string
+    KnowledgeItem:
+      type: object
+      required: [title, url, why]
+      properties:
+        title: 
+          type: string
+          description: 知识点标题
+        url: 
+          type: string
+          description: 学习链接
+        why: 
+          type: string
+          description: 推荐理由
+    Output:
+      type: object
+      required: [id, resume_md, interview_questions, knowledge_items]
+      properties:
+        id: 
+          type: string
+          description: 输出结果ID
+        resume_md: 
+          type: string
+          description: 优化后的简历Markdown
+        interview_questions:
+          type: array
+          description: 面试问题列表
+          items: 
+            type: string
+        knowledge_items:
+          type: array
+          description: 知识点推荐
+          items: 
+            $ref: '#/components/schemas/KnowledgeItem'
+    Task:
+      type: object
+      required: [id, status]
+      properties:
+        id: 
+          type: string
+          description: 任务ID
+        status: 
+          type: string
+          enum: [queued, running, done, error]
+          description: 任务状态
+        cost: 
+          type: number
+          nullable: true
+          description: 任务成本（元）
+        latency_ms: 
+          type: integer
+          nullable: true
+          description: 任务耗时（毫秒）
+        output: 
+          $ref: '#/components/schemas/Output'
+          description: 任务输出结果
+        error: 
+          type: string
+          nullable: true
+          description: 错误信息

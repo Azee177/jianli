@@ -1,0 +1,37 @@
+# 核心依赖
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.6
+httpx>=0.26.0
+python-dotenv>=1.0.1
+pydantic>=2.5.0
+
+# PDF处理（可选，按优先级）
+# pymupdf>=1.24.10  # 推荐，但可能有安装问题
+pdfminer.six>=20231228  # 备用PDF解析
+
+# JD抓取相关（可选）
+# playwright>=1.40.0  # BOSS抓取需要
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# 导出相关（可选）
+# weasyprint>=60.0  # PDF导出
+# python-docx>=1.1.0  # DOCX导出
+
+# 任务队列（可选）
+# celery>=5.3.0
+# redis>=5.0.0
+
+# 数据库（可选）
+# sqlalchemy>=2.0.0
+# alembic>=1.13.0
+# psycopg2-binary>=2.9.0
+
+# LLM相关（可选）
+# openai>=1.0.0
+# anthropic>=0.7.0
+
+# 其他工具
+jinja2>=3.1.0
+# pillow>=10.0.0
