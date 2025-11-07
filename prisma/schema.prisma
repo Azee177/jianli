@@ -150,3 +150,169 @@ enum FeedbackType {
 
   @@map("feedback_type")
 }
+
+// 新增：用户旅程
+model Journey {
+  id           String       @id @default(cuid())
+  userId       String       @map("user_id")
+  resumeId     String       @map("resume_id")
+  currentStage JourneyStage @default(UPLOAD) @map("current_stage")
+  metadata     Json         @default("{}") // 存储各阶段的元数据
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@map("journeys")
+}
+
+enum JourneyStage {
+  UPLOAD
+  PARSE_OK
+  INTENT_COLLECTING
+  TARGET_CONFIRMED
+  JD_FETCHED
+  COMMON_DIMS_LOCKED
+  DRAFT_V1
+  REWRITE_LOOP
+  COMPANY_QUARTER_DONE
+  PREP_READY
+  INTERVIEW_READY
+  EXPORTABLE
+  SUBMISSION_TRACKING
+
+  @@map("journey_stage")
+}
+
+// 新增：目标岗位
+model TargetRole {
+  id               String   @id @default(cuid())
+  userId           String   @map("user_id")
+  journeyId        String   @map("journey_id")
+  position         String
+  company          String?
+  city             String?
+  level            String?
+  salaryExpectation String? @map("salary_expectation")
+  isConfirmed      Boolean  @default(false) @map("is_confirmed")
+  confirmedAt      DateTime? @map("confirmed_at")
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("target_roles")
+}
+
+// 新增：共性维度
+model CommonDimension {
+  id                String   @id @default(cuid())
+  targetRoleId      String   @map("target_role_id")
+  title             String
+  description       String
+  importance        Float    @default(0.5)
+  frequency         Int      @default(0)
+  totalJds          Int      @default(0) @map("total_jds")
+  evidenceSentences String[] @map("evidence_sentences")
+  isLocked          Boolean  @default(false) @map("is_locked")
+  lockedAt          DateTime? @map("locked_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("common_dimensions")
+}
+
+// 新增：简历版本
+model ResumeVersion {
+  id                 String   @id @default(cuid())
+  resumeId           String   @map("resume_id")
+  version            Int      @default(1)
+  content            String   // Markdown格式
+  sectionsJson       String   @default("{}") @map("sections_json") // JSON存储各章节
+  changesDescription String[] @map("changes_description")
+  createdBy          String   @map("created_by") // 'user' or 'ai'
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("resume_versions")
+}
+
+// 新增：投递记录
+model SubmissionRecord {
+  id              String           @id @default(cuid())
+  userId          String           @map("user_id")
+  resumeVersionId String           @map("resume_version_id")
+  targetRoleId    String           @map("target_role_id")
+  company         String
+  position        String
+  status          SubmissionStatus @default(SUBMITTED)
+  submittedAt     DateTime         @default(now()) @map("submitted_at")
+  officialLink    String?          @map("official_link")
+  notes           String?
+  timeline        Json             @default("[]") // 状态变更时间线
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@map("submission_records")
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  VIEWED
+  INTERVIEW_SCHEDULED
+  INTERVIEWED
+  OFFER_RECEIVED
+  REJECTED
+  WITHDRAWN
+
+  @@map("submission_status")
+}
+
+// 新增：提醒
+model Reminder {
+  id               String        @id @default(cuid())
+  userId           String        @map("user_id")
+  submissionId     String?       @map("submission_id")
+  reminderType     ReminderType  @map("reminder_type")
+  reminderDate     DateTime      @map("reminder_date")
+  message          String
+  isTriggered      Boolean       @default(false) @map("is_triggered")
+  triggeredAt      DateTime?     @map("triggered_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  @@map("reminders")
+}
+
+enum ReminderType {
+  RESUME_UPDATE
+  FOLLOW_UP
+  INTERVIEW_PREP
+  CUSTOM
+
+  @@map("reminder_type")
+}
+
+// 新增：对话历史
+model ConversationHistory {
+  id          String   @id @default(cuid())
+  sessionId   String   @map("session_id")
+  userId      String   @map("user_id")
+  role        String   // 'user' or 'assistant'
+  content     String
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId])
+  @@map("conversation_histories")
+}
+
+// 新增：照片
+model Photo {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  resumeId    String?  @map("resume_id")
+  photoFormat String   @map("photo_format") // 'png', 'jpeg'
+  width       Int
+  height      Int
+  storageKey  String   @map("storage_key") // 存储键（对象存储或文件路径）
+  confidence  Float?   // 提取置信度
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("photos")
+}

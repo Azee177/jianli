@@ -1279,16 +1279,14 @@
 
 /* 可交互分割线样式 */
 .colored-divider-wrapper {
-  margin: 0;
-  padding: 0;
   cursor: move;
   position: relative;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, margin 0.2s ease;
   line-height: 0;
   display: block;
   width: 100%;
-  height: 28px;
   box-sizing: border-box;
+  padding: 0;
 }
 
 .colored-divider-wrapper::after {
@@ -1297,7 +1295,7 @@
   left: 0;
   right: 0;
   top: 50%;
-  height: 28px;
+  height: 12px;
   transform: translateY(-50%);
   border-radius: 8px;
   border: 1px dashed rgba(14, 165, 233, 0.35);
@@ -1318,8 +1316,8 @@
   align-items: center;
   justify-content: center;
   line-height: 0;
-  height: 100%;
-  padding: 0 12px;
+  height: 12px;
+  padding: 0;
   box-sizing: border-box;
   z-index: 1;
 }

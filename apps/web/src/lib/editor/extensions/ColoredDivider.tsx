@@ -7,7 +7,7 @@ import { Palette, Minus, Plus } from 'lucide-react';
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     coloredDivider: {
-      insertColoredDivider: (attrs?: { color?: string; thickness?: number; width?: number }) => ReturnType;
+      insertColoredDivider: (attrs?: { color?: string; thickness?: number; width?: number; marginTop?: string; marginBottom?: string }) => ReturnType;
     };
   }
 }
@@ -29,6 +29,8 @@ function ColoredDividerView({ node, updateAttributes, selected }: NodeViewProps)
   const color = node.attrs.color || '#d1d5db';
   const thickness = node.attrs.thickness || 2;
   const width = node.attrs.width || 100; // 百分比
+  const marginTop = node.attrs.marginTop || '0em';
+  const marginBottom = node.attrs.marginBottom || '0em';
 
   const cancelHideTimeout = useCallback(() => {
     if (hideTimeoutRef.current !== null) {
@@ -60,6 +62,17 @@ function ColoredDividerView({ node, updateAttributes, selected }: NodeViewProps)
     updateAttributes({ width: newWidth });
   };
 
+  const adjustSpacing = (delta: number) => {
+    // 解析当前的 em 值
+    const currentTop = parseFloat(marginTop);
+    const currentBottom = parseFloat(marginBottom);
+    const newValue = Math.max(0, Math.min(3, currentTop + delta * 0.25)); // 步进 0.25em
+    updateAttributes({ 
+      marginTop: `${newValue}em`, 
+      marginBottom: `${newValue}em` 
+    });
+  };
+
   const handleWrapperMouseLeave = () => {
     // 延迟隐藏工具栏
     scheduleHide();
@@ -69,6 +82,10 @@ function ColoredDividerView({ node, updateAttributes, selected }: NodeViewProps)
     <NodeViewWrapper
       className={`colored-divider-wrapper ${selected ? 'is-selected' : ''}`}
       data-drag-handle
+      style={{
+        marginTop,
+        marginBottom,
+      }}
       onMouseEnter={() => {
         cancelHideTimeout();
         setShowControls(true);
@@ -133,6 +150,26 @@ function ColoredDividerView({ node, updateAttributes, selected }: NodeViewProps)
                 type="button"
                 onClick={() => adjustWidth(10)}
                 title="增加长度"
+                className="divider-tool-btn"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+
+            <div className="divider-control-group">
+              <button
+                type="button"
+                onClick={() => adjustSpacing(-1)}
+                title="减小间距"
+                className="divider-tool-btn"
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <span className="divider-value">{parseFloat(marginTop).toFixed(2)}em</span>
+              <button
+                type="button"
+                onClick={() => adjustSpacing(1)}
+                title="增加间距"
                 className="divider-tool-btn"
               >
                 <Plus className="h-3 w-3" />
@@ -214,6 +251,20 @@ export const ColoredDivider = HorizontalRule.extend({
           'data-width': attributes.width,
         }),
       },
+      marginTop: {
+        default: '0em',
+        parseHTML: element => element.getAttribute('data-margin-top') ?? '0em',
+        renderHTML: attributes => ({
+          'data-margin-top': attributes.marginTop,
+        }),
+      },
+      marginBottom: {
+        default: '0em',
+        parseHTML: element => element.getAttribute('data-margin-bottom') ?? '0em',
+        renderHTML: attributes => ({
+          'data-margin-bottom': attributes.marginBottom,
+        }),
+      },
     };
   },
 
@@ -221,6 +272,9 @@ export const ColoredDivider = HorizontalRule.extend({
     const color = node.attrs.color || '#d1d5db';
     const thickness = node.attrs.thickness || 2;
     const width = node.attrs.width || 100;
+    const marginTop = node.attrs.marginTop || '0em';
+    const marginBottom = node.attrs.marginBottom || '0em';
+    
     const style = [
       HTMLAttributes.style,
       `border-top-color:${color}`,
@@ -228,6 +282,8 @@ export const ColoredDivider = HorizontalRule.extend({
       `width:${width}%`,
       'margin-left:auto',
       'margin-right:auto',
+      `margin-top:${marginTop}`,
+      `margin-bottom:${marginBottom}`,
     ]
       .filter(Boolean)
       .join(';');

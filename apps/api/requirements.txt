@@ -1,13 +1,14 @@
 # 核心依赖
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
-python-multipart>=0.0.6
+python-multipart>=0.0.9
 httpx>=0.26.0
 python-dotenv>=1.0.1
 pydantic>=2.5.0
+pydantic-settings>=2.0.0  # 配置管理
 
 # PDF处理（可选，按优先级）
-# pymupdf>=1.24.10  # 推荐，但可能有安装问题
+pymupdf>=1.24.10  # PDF解析和图片提取
 pdfminer.six>=20231228  # 备用PDF解析
 
 # JD抓取相关（可选）
@@ -34,4 +35,4 @@ lxml>=4.9.0
 
 # 其他工具
 jinja2>=3.1.0
-# pillow>=10.0.0
+pillow>=10.0.0  # 图片处理
