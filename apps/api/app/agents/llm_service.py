@@ -26,12 +26,13 @@ class LLMProvider(ABC):
 
 
 class QwenProvider(LLMProvider):
-    """通义千问提供者"""
+    """通义千问提供者 - 支持阿里云百炼平台"""
     
-    def __init__(self, api_key: str, model: str = "qwen-turbo"):
+    def __init__(self, api_key: str, model: str = "qwen-max"):
         self.api_key = api_key
         self.model = model
-        self.base_url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
+        # 使用兼容OpenAI的API endpoint
+        self.base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
     
     async def complete(
         self,
@@ -47,18 +48,21 @@ class QwenProvider(LLMProvider):
         
         payload = {
             "model": self.model,
-            "input": {
-                "messages": messages
-            },
-            "parameters": {
-                "temperature": temperature,
-                "max_tokens": max_tokens
-            }
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens
         }
         
-        # 如果需要JSON格式
+        # 如果需要JSON格式，在system message中强制要求
         if response_format == "json":
-            payload["parameters"]["result_format"] = "json_object"
+            # 在第一个消息前添加JSON格式要求
+            if messages and messages[0].get("role") == "system":
+                messages[0]["content"] += "\n\n请以JSON格式返回结果。"
+            else:
+                messages.insert(0, {
+                    "role": "system",
+                    "content": "请以JSON格式返回结果。"
+                })
         
         try:
             async with httpx.AsyncClient(timeout=60) as client:
@@ -70,9 +74,11 @@ class QwenProvider(LLMProvider):
                 response.raise_for_status()
                 result = response.json()
                 
-                return result["output"]["text"]
+                # 使用OpenAI兼容格式
+                return result["choices"][0]["message"]["content"]
         except Exception as e:
             logger.error(f"Qwen API call failed: {e}")
+            logger.error(f"Response: {response.text if 'response' in locals() else 'No response'}")
             raise
 
 

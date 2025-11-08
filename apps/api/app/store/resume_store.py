@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from ..schemas import ResumeBlock, ResumeContacts, ResumeMetadata, ResumeResponse
@@ -22,6 +22,10 @@ class ResumeRecord:
   skills: List[str]
   contacts: ResumeContacts
   metadata: ResumeMetadata
+  # LLM解析增强字段
+  structured_sections: Optional[Dict[str, Any]] = None
+  confidence_score: Optional[float] = None
+  parsing_method: Optional[str] = "rule-based"
   created_at: datetime = field(default_factory=datetime.utcnow)
   updated_at: datetime = field(default_factory=datetime.utcnow)
 

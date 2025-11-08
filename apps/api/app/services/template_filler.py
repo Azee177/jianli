@@ -233,3 +233,6 @@ def fill_resume_template(template: str, parsed_resume: ParsedResume) -> str:
     filler = TemplateFiller()
     return filler.fill_template(template, parsed_resume)
 
+
+
+

@@ -286,3 +286,6 @@ filled_html = fill_resume_template(template.markdown, parsed)
 1. 安装PDF处理库完善上传功能
 2. 开始实现岗位推荐系统
 
+
+
+

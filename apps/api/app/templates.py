@@ -113,6 +113,9 @@ EN_TEMPLATE = """\
 - Languages / Certifications:
 """
 
+# 导出默认HTML模板供渲染使用
+RESUME_TEMPLATE_HTML = TSINGHUA_TEMPLATE
+
 
 def load_templates() -> list[ResumeTemplate]:
   return [

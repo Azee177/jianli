@@ -187,3 +187,6 @@ pnpm dev
 2. ✅ 访问 http://localhost:8000/health 返回健康状态
 3. ✅ 前端可以成功连接后端上传简历
 
+
+
+

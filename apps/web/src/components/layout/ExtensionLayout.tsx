@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { SmartChatInterface } from '@/components/chat/SmartChatInterface';
 import { allExtensions, getExtensionById } from '@/lib/extensions';
-import { extractEditorHtmlFromResume } from '@/lib/resume-utils';
+import { extractEditorHtmlFromResume, fetchRenderedResumeHtml } from '@/lib/resume-utils';
 import { AppContext, ExtensionProps } from '@/types/extensions';
 
 import { ExtensionDock } from './ExtensionDock';
@@ -50,11 +50,26 @@ export function ExtensionLayout({
   };
 
   const handleContextChange = useCallback(
-    (updates: Partial<AppContext>) => {
+    async (updates: Partial<AppContext>) => {
       setAppContext(prev => ({ ...prev, ...updates }));
 
       if (updates.resume) {
-        const html = extractEditorHtmlFromResume(updates.resume);
+        // 优先尝试从后端获取格式化的HTML
+        let html: string;
+        
+        if (updates.resume.id) {
+          try {
+            console.log('Fetching rendered HTML from API for resume:', updates.resume.id);
+            html = await fetchRenderedResumeHtml(updates.resume.id);
+            console.log('Successfully fetched rendered HTML');
+          } catch (error) {
+            console.warn('Failed to fetch rendered HTML, falling back to raw text:', error);
+            html = extractEditorHtmlFromResume(updates.resume);
+          }
+        } else {
+          html = extractEditorHtmlFromResume(updates.resume);
+        }
+        
         onResumeChange(html);
         onResumeImported?.(html);
       }

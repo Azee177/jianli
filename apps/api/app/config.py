@@ -4,7 +4,10 @@ from __future__ import annotations
 import os
 from typing import Optional
 from functools import lru_cache
-from pydantic_settings import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    from pydantic import BaseSettings  # 兼容旧版本
 from pydantic import Field, SecretStr
 
 

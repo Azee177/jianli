@@ -1,38 +1,54 @@
-# 核心依赖
+# 核心Web框架
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
 python-multipart>=0.0.9
+
+# HTTP客户端
 httpx>=0.26.0
+
+# 配置和环境变量
 python-dotenv>=1.0.1
 pydantic>=2.5.0
-pydantic-settings>=2.0.0  # 配置管理
+pydantic-settings>=2.0.0
 
-# PDF处理（可选，按优先级）
+# PDF处理
 pymupdf>=1.24.10  # PDF解析和图片提取
 pdfminer.six>=20231228  # 备用PDF解析
 
-# JD抓取相关（可选）
-# playwright>=1.40.0  # BOSS抓取需要
+# 网页抓取和解析
 beautifulsoup4>=4.12.0
 lxml>=4.9.0
 
-# 导出相关（可选）
-# weasyprint>=60.0  # PDF导出
-# python-docx>=1.1.0  # DOCX导出
+# LLM相关（必需 - 用于智能简历解析）
+openai>=1.0.0  # 通义千问API调用（兼容OpenAI格式）
 
-# 任务队列（可选）
+# 模板渲染
+jinja2>=3.1.0
+
+# 图片处理
+pillow>=10.0.0
+
+# 可选功能（如需使用请取消注释）
+# ============================================
+
+# 浏览器自动化（BOSS直聘抓取需要）
+# playwright>=1.40.0
+
+# PDF导出
+# weasyprint>=60.0
+
+# DOCX导出
+# python-docx>=1.1.0
+
+# 任务队列（异步任务处理）
 # celery>=5.3.0
 # redis>=5.0.0
 
-# 数据库（可选）
+# 数据库（持久化存储）
 # sqlalchemy>=2.0.0
 # alembic>=1.13.0
-# psycopg2-binary>=2.9.0
+# psycopg2-binary>=2.9.0  # PostgreSQL
+# pymongo>=4.0.0  # MongoDB
 
-# LLM相关（可选）
-# openai>=1.0.0
-# anthropic>=0.7.0
-
-# 其他工具
-jinja2>=3.1.0
-pillow>=10.0.0  # 图片处理
+# 其他LLM提供商
+# anthropic>=0.7.0  # Claude

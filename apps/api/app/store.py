@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from uuid import uuid4
 
 from .schemas import ResumeBlock, ResumeContacts, ResumeMetadata, ResumeResponse
 
 
-@dataclass(slots=True)
+@dataclass
 class ResumeRecord:
   id: str
   user_id: str
@@ -24,6 +24,10 @@ class ResumeRecord:
   metadata: ResumeMetadata
   created_at: datetime = field(default_factory=datetime.utcnow)
   updated_at: datetime = field(default_factory=datetime.utcnow)
+  # 新增字段：LLM解析结果
+  structured_sections: Optional[Dict[str, Any]] = field(default=None)
+  confidence_score: Optional[float] = field(default=None)
+  parsing_method: str = field(default="rule-based")  # "llm" or "rule-based"
 
 
 class ResumeStore:

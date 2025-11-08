@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .routes.resumes import create_router as create_resume_router
+from .routes.render import create_router as create_render_router
+from .routes.suggestions import create_router as create_suggestions_router
 from .routes.jd_sources import create_jd_router
 from .routes.optimize import create_optimize_router
 from .routes.export import create_export_router
@@ -72,6 +74,8 @@ websocket_service = WebSocketService(task_store)
 
 # 注册路由
 app.include_router(create_resume_router(resume_service))
+app.include_router(create_render_router(resume_service))  # 新增：渲染路由
+app.include_router(create_suggestions_router(resume_service))  # 新增：智能建议路由
 app.include_router(create_jd_router(jd_service, target_service, commonality_service))
 app.include_router(create_optimize_router(optimize_service))
 app.include_router(create_export_router(export_service))

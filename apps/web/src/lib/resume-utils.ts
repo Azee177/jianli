@@ -76,3 +76,57 @@ export const extractEditorHtmlFromResume = (resume: any): string => {
   return DEFAULT_RESUME_CONTENT;
 };
 
+/**
+ * 从后端API获取渲染后的简历HTML
+ * @param resumeId 简历ID
+ * @returns Promise<string> 格式化的HTML内容
+ */
+export const fetchRenderedResumeHtml = async (resumeId: string): Promise<string> => {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const response = await fetch(`${apiUrl}/resumes/${resumeId}/render`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'text/html',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch rendered resume: ${response.statusText}`);
+    }
+
+    const html = await response.text();
+    return html || DEFAULT_RESUME_CONTENT;
+  } catch (error) {
+    console.error('Error fetching rendered resume:', error);
+    // 降级到默认内容
+    return DEFAULT_RESUME_CONTENT;
+  }
+};
+
+/**
+ * 获取结构化简历数据
+ * @param resumeId 简历ID
+ * @returns Promise<any> 结构化数据
+ */
+export const fetchStructuredResumeData = async (resumeId: string): Promise<any> => {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const response = await fetch(`${apiUrl}/resumes/${resumeId}/structured`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch structured resume: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching structured resume:', error);
+    return null;
+  }
+};
+

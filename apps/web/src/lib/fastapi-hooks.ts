@@ -2,7 +2,7 @@ import useSWR from "swr";
 import { Resume, JD, Task } from "./types";
 
 // FastAPI后端配置
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3002';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 

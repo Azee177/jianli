@@ -41,12 +41,12 @@ def main():
         print("   建议创建.env文件配置API密钥")
     
     # 启动服务
-    port = int(os.getenv("PORT", "3002"))
+    port = int(os.getenv("PORT", "8000"))
     
     print(f"🚀 启动Resume Copilot API服务...")
     print(f"   端口: {port}")
-    print(f"   文档: http://localhost:{port}/docs")
-    print(f"   健康检查: http://localhost:{port}/health")
+    print(f"   文档: http://127.0.0.1:{port}/docs")
+    print(f"   健康检查: http://127.0.0.1:{port}/health")
     print()
     
     try:
@@ -55,7 +55,7 @@ def main():
             sys.executable, "-m", "uvicorn",
             "app.main:app",
             "--reload",
-            "--host", "0.0.0.0", 
+            "--host", "127.0.0.1", 
             "--port", str(port)
         ]
         

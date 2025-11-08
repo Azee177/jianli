@@ -37,6 +37,7 @@ def create_router(service: ResumeService) -> APIRouter:
     text: str | None = Form(default=None),
     template_key: str | None = Form(default=None, alias="templateKey"),
     title: str | None = Form(default=None),
+    use_llm: bool = Form(default=False, alias="useLlm"),  # 新增：是否使用LLM解析（默认关闭避免VPN问题）
     user_id: Optional[str] = Header(default=None, alias="x-user-id"),
     svc: ResumeService = Depends(get_service),
   ) -> ResumeResponse:
@@ -45,6 +46,7 @@ def create_router(service: ResumeService) -> APIRouter:
     text_val = text
     template_key_val = template_key
     title_val = title
+    use_llm_val = use_llm
 
     if "application/json" in content_type:
       body = await request.json()
@@ -52,6 +54,7 @@ def create_router(service: ResumeService) -> APIRouter:
         text_val = body.get("text", text_val)
         template_key_val = body.get("templateKey", template_key_val)
         title_val = body.get("title", title_val)
+        use_llm_val = body.get("useLlm", use_llm_val)
 
     file_bytes = await file.read() if file is not None else None
 
@@ -63,6 +66,7 @@ def create_router(service: ResumeService) -> APIRouter:
       mime_type=file.content_type if file else None,
       template_key=template_key_val,
       title=title_val,
+      use_llm=use_llm_val,
     )
 
   @router.get("/resumes", response_model=ResumeListResponse)

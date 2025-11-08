@@ -3,10 +3,12 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 from uuid import uuid4
+import logging
 
 from fastapi import HTTPException, status
 
 from .. import parser
+from ..llm_parser import get_llm_parser
 from ..ocr import OcrResult, extract_text_from_pdf, fallback_ocr_with_gateway
 from ..schemas import (
   DraftSummary,
@@ -16,6 +18,8 @@ from ..schemas import (
   ResumeTemplate,
 )
 from ..store import ResumeRecord, ResumeStore, record_to_response
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_USER_ID = "demo-user"
@@ -36,6 +40,7 @@ class ResumeService:
     mime_type: Optional[str],
     template_key: Optional[str],
     title: Optional[str],
+    use_llm: bool = True,  # 新增：是否使用LLM解析
   ) -> ResumeResponse:
     user = user_id or DEFAULT_USER_ID
     normalized_text = (text or "").strip()
@@ -56,7 +61,23 @@ class ResumeService:
         detail="未能从上传内容识别出文本，请检查文件是否清晰。",
       )
 
-    parsed = parser.parse_resume(normalized_text)
+    # 使用LLM或规则解析
+    if use_llm:
+      try:
+        logger.info(f"使用LLM解析简历，文件: {file_name}")
+        llm_parser_instance = get_llm_parser()
+        enhanced_parsed = await llm_parser_instance.parse_resume(
+          normalized_text,
+          use_llm=True,
+          fallback_to_rules=True
+        )
+        parsed = enhanced_parsed  # 使用增强解析结果
+        logger.info(f"解析方法: {enhanced_parsed.parsing_method}, 置信度: {enhanced_parsed.confidence_score}")
+      except Exception as e:
+        logger.error(f"LLM解析失败，降级到规则解析: {e}")
+        parsed = parser.parse_resume(normalized_text)
+    else:
+      parsed = parser.parse_resume(normalized_text)
 
     metadata = ResumeMetadata(
       ocrEngine=(ocr_meta.engine if ocr_meta else "manual"),
@@ -73,6 +94,12 @@ class ResumeService:
     )
 
     resume_id = self.store.generate_id()
+    
+    # 提取LLM解析的额外字段
+    structured_sections = getattr(parsed, 'structured_sections', None)
+    confidence_score = getattr(parsed, 'confidence_score', None)
+    parsing_method = getattr(parsed, 'parsing_method', 'rule-based')
+    
     record = ResumeRecord(
       id=resume_id,
       user_id=user,
@@ -86,6 +113,9 @@ class ResumeService:
       skills=parsed.skills,
       contacts=parsed.contacts,
       metadata=metadata,
+      structured_sections=structured_sections,
+      confidence_score=confidence_score,
+      parsing_method=parsing_method,
     )
 
     saved = self.store.create(record)
