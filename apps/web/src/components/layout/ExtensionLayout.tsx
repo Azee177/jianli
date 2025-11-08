@@ -169,11 +169,11 @@ export function ExtensionLayout({
 
       {showRightPanel && (
         <aside
-          className="fixed top-[56px] right-0 z-10 h-[calc(100vh-56px)] border-l border-white/10 bg-[rgba(10,12,20,0.95)] backdrop-blur-xl transition-[width]"
+          className="fixed top-[56px] right-0 z-10 h-[calc(100vh-56px)] border-l border-gray-200 bg-white backdrop-blur-xl transition-[width] shadow-lg"
           style={{ width: `${rightPanelWidth}px` }}
         >
           <div
-            className="absolute -left-2 top-0 bottom-0 w-3 cursor-col-resize rounded-l-full transition-all duration-200 hover:bg-sky-500/30"
+            className="absolute -left-2 top-0 bottom-0 w-3 cursor-col-resize rounded-l-full transition-all duration-200 hover:bg-blue-200"
             onPointerDown={handleRightPanelResizeStart}
           />
           <SmartChatInterface
@@ -187,7 +187,7 @@ export function ExtensionLayout({
 
       <button
         onClick={() => setShowRightPanel(value => !value)}
-        className="fixed z-20 flex h-10 w-8 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-white/10 bg-[rgba(10,12,20,0.95)] text-slate-400 transition-colors hover:text-slate-200"
+        className="fixed z-20 flex h-10 w-8 -translate-y-1/2 items-center justify-center rounded-l-lg border border-r-0 border-gray-200 bg-white text-gray-600 transition-colors hover:text-gray-900 hover:bg-gray-50 shadow-md"
         style={{ top: '50%', right: `${rightToggleOffset}px` }}
         title={showRightPanel ? '隐藏对话' : '显示对话'}
       >

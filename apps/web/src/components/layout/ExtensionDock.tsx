@@ -45,8 +45,8 @@ export function ExtensionDock({
       className={`
         relative flex h-12 w-12 items-center justify-center rounded-xl border transition-all duration-200
         ${isActive 
-          ? 'border-sky-500/30 bg-sky-500/10 text-sky-200 shadow-lg' 
-          : 'border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:border-white/20 hover:text-slate-200'
+          ? 'border-blue-300 bg-blue-50 text-blue-600 shadow-lg shadow-blue-100' 
+          : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:border-blue-200 hover:text-blue-600'
         }
       `}
       title={extension.name}
@@ -62,7 +62,7 @@ export function ExtensionDock({
       
       {/* Tooltip */}
       {hoveredExtension === extension.id && (
-        <div className="absolute left-full ml-2 z-50 rounded-lg bg-gray-900 px-2 py-1 text-xs text-white shadow-lg">
+        <div className="absolute left-full ml-2 z-50 rounded-lg bg-gray-800 px-2 py-1 text-xs text-white shadow-lg">
           {extension.name}
         </div>
       )}
@@ -70,18 +70,18 @@ export function ExtensionDock({
   );
 
   return (
-    <aside className="flex w-16 flex-col border-r border-white/10 bg-[rgba(10,12,20,0.95)] backdrop-blur-xl">
+    <aside className="flex w-16 flex-col border-r border-gray-200 bg-gray-50 backdrop-blur-xl">
       <div className="flex flex-col items-center gap-3 p-3">
         {/* 新建简历按钮 */}
         <button
           onClick={onNewResume}
-          className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 transition-all duration-200 hover:bg-white/10 hover:border-white/20 hover:text-slate-200"
+          className="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
           title="新建简历"
         >
           <Plus className="h-5 w-5" />
         </button>
 
-        <div className="h-px w-8 bg-white/10" />
+        <div className="h-px w-8 bg-gray-200" />
 
         {/* 核心扩展 */}
         <div className="flex flex-col gap-2">
@@ -97,7 +97,7 @@ export function ExtensionDock({
 
         {auxiliaryExtensions.length > 0 && (
           <>
-            <div className="h-px w-8 bg-white/10" />
+            <div className="h-px w-8 bg-gray-200" />
             
             {/* 辅助扩展 */}
             <div className="flex flex-col gap-2">
@@ -117,7 +117,7 @@ export function ExtensionDock({
       {/* 底部设置 */}
       <div className="mt-auto p-3">
         <button
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-400 transition-all duration-200 hover:bg-white/10 hover:border-white/20 hover:text-slate-200"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
           title="设置"
         >
           <Settings className="h-4 w-4" />

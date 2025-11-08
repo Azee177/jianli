@@ -33,12 +33,12 @@ export function Header({
     }
   };
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-black/30 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/80 backdrop-blur-xl shadow-sm">
       <div className="flex items-center justify-between gap-4 px-4 py-3">
         <div className="flex items-center gap-3">
           <button
             onClick={onMenuToggle}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-sm hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             type="button"
           >
             <Menu className="h-4 w-4" />
@@ -47,8 +47,8 @@ export function Header({
             </span>
           </button>
 
-          <div className="flex items-center gap-2 text-slate-100">
-            <Sparkles className="h-5 w-5" />
+          <div className="flex items-center gap-2 text-gray-900">
+            <Sparkles className="h-5 w-5 text-[#3330E4]" />
             <span className="font-semibold tracking-wide">Resume Copilot</span>
           </div>
         </div>
@@ -58,17 +58,17 @@ export function Header({
             {progressSteps.map((step, index) => {
               const chipClasses =
                 step.status === 'completed'
-                  ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25'
+                  ? 'border-emerald-400 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                   : step.status === 'current'
-                  ? 'border-sky-500/40 bg-sky-500/15 text-sky-100 hover:bg-sky-500/25'
-                  : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10';
+                  ? 'border-blue-400 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                  : 'border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100';
 
               const dotClasses =
                 step.status === 'completed'
-                  ? 'bg-emerald-400'
+                  ? 'bg-emerald-500'
                   : step.status === 'current'
-                  ? 'bg-sky-400 animate-pulse'
-                  : 'bg-slate-500/70';
+                  ? 'bg-blue-600 animate-pulse'
+                  : 'bg-gray-400';
 
               return (
                 <div key={step.id} className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export function Header({
                     <span>{step.title}</span>
                   </button>
                   {index < progressSteps.length - 1 && (
-                    <span className="h-px w-6 bg-white/15" />
+                    <span className="h-px w-6 bg-gray-200" />
                   )}
                 </div>
               );
@@ -97,7 +97,7 @@ export function Header({
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm hover:bg-white/10 transition-colors"
+              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
               {user.avatar ? (
                 <img 
@@ -108,16 +108,16 @@ export function Header({
               ) : (
                 <User className="w-4 h-4" />
               )}
-              <span className="hidden md:inline text-slate-200">{user.name}</span>
+              <span className="hidden md:inline">{user.name}</span>
             </button>
 
             {showUserMenu && (
-              <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-white/10 bg-black/90 backdrop-blur-xl shadow-xl">
-                <div className="p-3 border-b border-white/10">
-                  <p className="text-sm font-medium text-slate-200">{user.name}</p>
-                  <p className="text-xs text-slate-400">{user.email}</p>
+              <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-gray-200 bg-white backdrop-blur-xl shadow-xl">
+                <div className="p-3 border-b border-gray-200">
+                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                  <p className="text-xs text-gray-600">{user.email}</p>
                   {user.subscription && (
-                    <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                    <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 border border-blue-300">
                       {user.subscription.plan.toUpperCase()}
                     </span>
                   )}
@@ -129,7 +129,7 @@ export function Header({
                       setShowSettings(true);
                       setShowUserMenu(false);
                     }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-lg transition-colors"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <Settings className="w-4 h-4" />
                     设置
@@ -137,7 +137,7 @@ export function Header({
                   
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     登出

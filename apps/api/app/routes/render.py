@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from ..services import ResumeService
 from ..services.template_filler import fill_resume_template
+from ..services.enhanced_template_filler import fill_template_with_structured_data
 from ..templates import RESUME_TEMPLATE_HTML
 
 logger = logging.getLogger(__name__)
@@ -52,19 +53,43 @@ def create_router(service: ResumeService) -> APIRouter:
                     detail="简历不存在"
                 )
             
-            # 重新构建ParsedResume对象
-            from ..parser import ParsedResume
-            parsed_resume = ParsedResume(
-                normalized=record.raw_text,
-                blocks=record.parsed_blocks,
-                contacts=record.contacts,
-                skills=record.skills,
-                language=record.metadata.language if record.metadata else "zh"
-            )
-            
-            # 填充模板
             logger.info(f"渲染简历 {resume_id}")
-            html_content = fill_resume_template(RESUME_TEMPLATE_HTML, parsed_resume)
+            
+            # 检查是否有LLM解析的结构化数据
+            has_structured_data = hasattr(record, 'structured_sections') and record.structured_sections
+            
+            if has_structured_data:
+                # 使用增强版填充器（结构化数据）
+                logger.info("使用结构化数据渲染简历")
+                
+                contacts_dict = {
+                    'name': record.contacts.name,
+                    'email': record.contacts.email,
+                    'phone': record.contacts.phone,
+                    'location': record.contacts.location,
+                    'website': record.contacts.website,
+                }
+                
+                html_content = fill_template_with_structured_data(
+                    RESUME_TEMPLATE_HTML,
+                    record.structured_sections,
+                    contacts_dict,
+                    photo_url=None  # TODO: 从存储中获取照片URL
+                )
+            else:
+                # 降级到传统方法（块解析）
+                logger.info("使用传统块解析渲染简历")
+                
+                from ..parser import ParsedResume
+                parsed_resume = ParsedResume(
+                    normalized=record.raw_text,
+                    blocks=record.parsed_blocks,
+                    contacts=record.contacts,
+                    skills=record.skills,
+                    language=record.metadata.language if record.metadata else "zh"
+                )
+                
+                html_content = fill_resume_template(RESUME_TEMPLATE_HTML, parsed_resume)
             
             return HTMLResponse(content=html_content)
             

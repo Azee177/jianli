@@ -61,14 +61,14 @@ export function ExtensionPanel({
       className="fixed top-[56px] left-16 h-[calc(100vh-56px)] overflow-hidden z-10"
       style={{ width: `${width}px` }}
     >
-      <div className="relative flex h-full flex-col border-r border-white/10 bg-[rgba(10,12,20,0.95)] shadow-2xl backdrop-blur-xl">
+      <div className="relative flex h-full flex-col border-r border-gray-200 bg-white shadow-lg backdrop-blur-xl">
         {/* Panel Header */}
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 bg-gray-50">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
               {extension.icon}
             </div>
-            <h2 className="font-medium text-slate-100">{extension.name}</h2>
+            <h2 className="font-medium text-gray-900">{extension.name}</h2>
             {extension.badge && (
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
                 {typeof extension.badge === 'number' && extension.badge > 99 ? '99+' : extension.badge}
@@ -84,7 +84,7 @@ export function ExtensionPanel({
 
         {/* Resize Handle */}
         <div
-          className="absolute -right-2 top-0 bottom-0 w-3 cursor-col-resize rounded-l-full transition-all duration-200 hover:bg-sky-500/30"
+          className="absolute -right-2 top-0 bottom-0 w-3 cursor-col-resize rounded-l-full transition-all duration-200 hover:bg-blue-200"
           onPointerDown={handlePanelResizeStart}
         />
       </div>

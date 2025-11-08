@@ -37,7 +37,7 @@ def create_router(service: ResumeService) -> APIRouter:
     text: str | None = Form(default=None),
     template_key: str | None = Form(default=None, alias="templateKey"),
     title: str | None = Form(default=None),
-    use_llm: bool = Form(default=False, alias="useLlm"),  # 新增：是否使用LLM解析（默认关闭避免VPN问题）
+    use_llm: bool = Form(default=True, alias="useLlm"),  # 使用LLM智能解析简历，提供更准确的结果
     user_id: Optional[str] = Header(default=None, alias="x-user-id"),
     svc: ResumeService = Depends(get_service),
   ) -> ResumeResponse:

@@ -236,3 +236,6 @@ def fill_resume_template(template: str, parsed_resume: ParsedResume) -> str:
 
 
 
+
+
+

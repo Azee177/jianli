@@ -213,11 +213,21 @@ class UploadService:
         self, object_key: str, user_id: Optional[str], 
         title: Optional[str], template_key: Optional[str]
     ) -> Dict[str, Any]:
-        # 模拟从对象存储读取文件并创建简历
+        """
+        从上传的object_key创建简历
+        注意：在生产环境中，这应该从对象存储读取文件
+        现在我们期望前端直接调用 POST /resumes 并上传文件
+        """
+        # 模拟任务创建，实际上应该由前端直接调用 /resumes 端点
         task_id = f"upload_{uuid4().hex[:8]}"
         task = self.task_store.create_task(task_id, TaskType.OCR, user_id or "demo-user")
         
-        return {"task_id": task_id, "message": "简历创建任务已提交"}
+        # 标记：这个服务应该由前端直接调用 ResumeService 的 create_resume
+        return {
+            "task_id": task_id, 
+            "message": "请直接使用POST /resumes上传文件以获得最佳解析效果",
+            "recommendation": "使用multipart/form-data直接上传PDF文件"
+        }
 
 
 class TaskService:
