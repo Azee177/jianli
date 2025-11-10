@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, Bot } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Plus, Paperclip } from 'lucide-react';
+import { sendChatMessage } from '@/lib/fastapi-hooks';
 
 interface Message {
   id: string;
@@ -13,15 +14,18 @@ interface Message {
 interface SmartChatInterfaceProps {
   selectedText?: string | null;
   onOptimize?: (text: string) => void;
+  onFileUpload?: (file: File) => void;
 }
 
-export function SmartChatInterface({ selectedText, onOptimize }: SmartChatInterfaceProps) {
+export function SmartChatInterface({ selectedText, onOptimize, onFileUpload }: SmartChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -61,26 +65,115 @@ export function SmartChatInterface({ selectedText, onOptimize }: SmartChatInterf
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue('');
     setIsLoading(true);
 
-    // 模拟AI响应
-    setTimeout(() => {
+    try {
+      // 调用真实的LLM API
+      const response = await sendChatMessage({
+        message: currentInput,
+        session_id: sessionId || undefined,
+        system_message: !sessionId ? "你是一个专业的简历优化助手。你善于帮助用户优化简历内容，提供针对性的建议，并用清晰、友好的语言与用户交流。" : undefined,
+        temperature: 0.7,
+        provider: 'qwen'  // 默认使用通义千问，可以改为 'deepseek' 或 'openai'
+      });
+
+      // 保存session ID
+      if (!sessionId && response.session_id) {
+        setSessionId(response.session_id);
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: generateResponse(userMessage.content),
+        content: response.message,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      
+      // 显示错误消息
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: `抱歉，对话出现错误: ${error instanceof Error ? error.message : '未知错误'}。\n\n可能的原因:\n1. API key未配置或无效\n2. 网络连接问题\n3. 后端服务未启动\n\n请检查后端配置的 .env 文件中是否正确设置了 QWEN_API_KEY。`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000 + Math.random() * 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 检查文件类型
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      alert('仅支持 PDF 和 Word (.doc, .docx) 格式的文件');
+      return;
+    }
+
+    // 检查文件大小（限制为 10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      alert('文件大小不能超过 10MB');
+      return;
+    }
+
+    // 添加上传消息
+    const uploadMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: `📎 已上传文件: ${file.name}`,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, uploadMessage]);
+
+    // 模拟文件处理
+    setIsLoading(true);
+    setTimeout(() => {
+      const responseMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: `我已经收到您的简历文件《${file.name}》。正在分析中...
+
+我会从以下几个方面对您的简历进行优化：
+• 格式规范性检查
+• 内容结构优化
+• 关键词匹配度分析
+• 量化成果建议
+
+稍后会为您生成详细的优化建议报告。`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, responseMessage]);
+      setIsLoading(false);
+      
+      // 调用回调
+      if (onFileUpload) {
+        onFileUpload(file);
+      }
+    }, 1500);
+
+    // 重置文件输入
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -197,8 +290,26 @@ export function SmartChatInterface({ selectedText, onOptimize }: SmartChatInterf
       )}
 
       {/* Input */}
-      <div className="p-4 border-t border-white/10">
-        <div className="flex gap-2">
+      <div className="p-4 border-t border-blue-100 bg-white/95 backdrop-blur-sm">
+        <div className="flex gap-2 items-center">
+          {/* 文件上传按钮 */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isLoading}
+            className="flex-shrink-0 w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg flex items-center justify-center shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            title="上传简历文件 (PDF, Word)"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+
+          {/* 输入框 */}
           <input
             ref={inputRef}
             type="text"
@@ -206,17 +317,26 @@ export function SmartChatInterface({ selectedText, onOptimize }: SmartChatInterf
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="输入你的问题..."
-            className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50"
+            className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             disabled={isLoading}
           />
+
+          {/* 发送按钮 */}
           <button
             onClick={handleSend}
             disabled={!inputValue.trim() || isLoading}
-            className="p-2 bg-sky-500/20 border border-sky-500/30 rounded-lg hover:bg-sky-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-shrink-0 w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg flex items-center justify-center shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            title="发送消息"
           >
-            <Send className="w-4 h-4 text-sky-400" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
+        
+        {/* 文件格式提示 */}
+        <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+          <Paperclip className="w-3 h-3" />
+          支持上传 PDF、Word 格式的简历文件（最大 10MB）
+        </p>
       </div>
     </div>
   );

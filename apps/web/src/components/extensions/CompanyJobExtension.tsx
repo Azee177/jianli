@@ -16,6 +16,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { ExtensionProps, JDItem, Target as TargetType, FitReport } from '@/types/extensions';
+import { searchJD, setTarget as setTargetAPI, parseJD } from '@/lib/fastapi-hooks';
 
 export function CompanyJobExtension({ context, onContextChange }: ExtensionProps) {
   const [inputMode, setInputMode] = useState<'link' | 'text' | 'image'>('link');
@@ -26,6 +27,9 @@ export function CompanyJobExtension({ context, onContextChange }: ExtensionProps
   const [fitReport, setFitReport] = useState<FitReport | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchCompany, setSearchCompany] = useState('');
+  const [searchTitle, setSearchTitle] = useState('');
+  const [searchCity, setSearchCity] = useState('');
 
   // Mock data for demonstration
   const mockJDResults: JDItem[] = [
@@ -81,41 +85,118 @@ export function CompanyJobExtension({ context, onContextChange }: ExtensionProps
     ]
   };
 
-  useEffect(() => {
-    if (searchQuery) {
-      setJdResults(mockJDResults.filter(jd => 
-        jd.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        jd.company.toLowerCase().includes(searchQuery.toLowerCase())
-      ));
-    } else {
-      setJdResults(mockJDResults);
+  // 执行搜索
+  const handleSearch = async () => {
+    if (!searchTitle && !searchCompany) {
+      alert('请至少输入职位名称或公司名称');
+      return;
     }
-  }, [searchQuery]);
 
-  const handleJDParse = async () => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const result = await searchJD({
+        company: searchCompany || undefined,
+        title: searchTitle || undefined,
+        city: searchCity || undefined,
+        limit: 20
+      });
+      
+      // 转换后端返回的数据格式为前端格式
+      const formattedResults: JDItem[] = (result.jds || result.results || []).map((item: any) => ({
+        id: item.id || item.jd_id,
+        title: item.title || item.position,
+        company: item.company,
+        location: item.location || item.city,
+        source: item.source || item.platform,
+        fitScore: item.match_score || 0,
+        keySkills: item.key_skills || item.requirements || [],
+        requirements: item.requirements || [],
+        culture: item.culture || [],
+        updatedDays: item.updated_days || 0,
+        hasReferral: item.has_referral || false,
+        isRemote: item.is_remote || false,
+        url: item.url || item.link
+      }));
+      
+      setJdResults(formattedResults);
+      
+      // 如果没有结果，使用Mock数据作为降级
+      if (formattedResults.length === 0) {
+        setJdResults(mockJDResults);
+      }
+    } catch (error) {
+      console.error('JD search failed:', error);
+      // 使用Mock数据作为降级
       setJdResults(mockJDResults);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleSetTarget = (jd: JDItem) => {
-    const target: TargetType = {
-      id: jd.id,
-      company: jd.company,
-      role: jd.title,
-      location: jd.location,
-      jdText: `${jd.title} at ${jd.company}`,
-      culture: jd.culture,
-      fitScore: jd.fitScore,
-      createdAt: new Date()
-    };
-    
-    setSelectedJD(jd);
-    setFitReport(mockFitReport);
-    onContextChange({ target, jd });
+  const handleJDParse = async () => {
+    if (!jdInput.trim()) {
+      alert('请输入JD链接或文本');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const jd = await parseJD(
+        inputMode === 'link' ? { url: jdInput } : { text: jdInput }
+      );
+      
+      // 将解析的JD添加到结果列表
+      const newJDItem: JDItem = {
+        id: jd.id,
+        title: jd.title || jd.position || '未知职位',
+        company: jd.company || '未知公司',
+        location: jd.city || jd.location || '未知',
+        source: '手动解析',
+        fitScore: 0,
+        keySkills: jd.key_skills || [],
+        requirements: jd.requirements || [],
+        culture: [],
+        updatedDays: 0,
+        hasReferral: false
+      };
+      
+      setJdResults([newJDItem, ...jdResults]);
+      setJdInput('');
+    } catch (error) {
+      console.error('JD parse failed:', error);
+      alert('JD解析失败，请检查输入');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSetTarget = async (jd: JDItem) => {
+    try {
+      // 调用真实的目标设定API
+      const targetResult = await setTargetAPI(jd.id);
+      
+      const target: TargetType = {
+        id: targetResult.id || jd.id,
+        company: jd.company,
+        role: jd.title,
+        location: jd.location,
+        jdText: `${jd.title} at ${jd.company}`,
+        culture: jd.culture,
+        fitScore: jd.fitScore,
+        createdAt: new Date()
+      };
+      
+      setSelectedJD(jd);
+      setFitReport(mockFitReport);
+      
+      // 更新上下文
+      await onContextChange({ target, jd });
+      
+      alert(`已设置目标岗位：${jd.company} - ${jd.title}`);
+    } catch (error) {
+      console.error('Failed to set target:', error);
+      alert('设置目标岗位失败');
+    }
   };
 
   const handleCompare = (jd: JDItem) => {
@@ -188,41 +269,66 @@ export function CompanyJobExtension({ context, onContextChange }: ExtensionProps
           </button>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        {/* Multi-Source Search */}
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-gray-700">多平台搜索</label>
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              placeholder="公司名称"
+              value={searchCompany}
+              onChange={(e) => setSearchCompany(e.target.value)}
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+            <input
+              type="text"
+              placeholder="职位名称"
+              value={searchTitle}
+              onChange={(e) => setSearchTitle(e.target.value)}
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
           <input
             type="text"
-            placeholder="搜索公司名 / 岗位关键词..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-3 py-2 text-sm text-slate-100 placeholder-slate-400 focus:border-sky-500/50 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
+            placeholder="城市（可选）"
+            value={searchCity}
+            onChange={(e) => setSearchCity(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
+          <button
+            onClick={handleSearch}
+            disabled={isLoading || (!searchTitle && !searchCompany)}
+            className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-md hover:shadow-lg hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            {isLoading ? '搜索中...' : '🔍 搜索岗位'}
+          </button>
         </div>
 
         {/* Smart Recommendations */}
-        <div className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
           <Zap className="h-3 w-3" />
-          <span>智能推荐：基于简历自动匹配相关岗位</span>
+          <span>聚合 Boss直聘、拉勾、51Job、实习僧</span>
         </div>
       </div>
 
       {/* Current Target */}
       {context.target && (
-        <div className="border-b border-white/10 bg-sky-500/10 p-4">
+        <div className="border-b border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Target className="h-5 w-5 text-sky-400" />
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <Target className="h-4 w-4 text-white" />
+              </div>
               <div>
-                <div className="font-medium text-sky-200">
+                <div className="font-semibold text-blue-900">
                   {context.target.company} · {context.target.role}
                 </div>
-                <div className="text-xs text-sky-300">
-                  匹配度 {context.target.fitScore}% · 解析置信度 0.82
+                <div className="text-xs text-blue-600">
+                  匹配度 {context.target.fitScore}%
                 </div>
               </div>
             </div>
-            <button className="text-xs text-sky-300 hover:text-sky-200">
+            <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">
               重新选择
             </button>
           </div>
@@ -231,86 +337,98 @@ export function CompanyJobExtension({ context, onContextChange }: ExtensionProps
 
       {/* Results */}
       <div className="flex-1 overflow-auto custom-scrollbar p-4 space-y-3">
-        {jdResults.map((jd) => (
-          <div
-            key={jd.id}
-            className="rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-medium text-slate-100">{jd.title}</h3>
-                  {jd.hasReferral && (
-                    <span className="rounded bg-green-500/20 px-2 py-0.5 text-xs text-green-300">
-                      内推
-                    </span>
-                  )}
-                  {jd.isRemote && (
-                    <span className="rounded bg-blue-500/20 px-2 py-0.5 text-xs text-blue-300">
-                      远程
-                    </span>
-                  )}
-                </div>
-                
-                <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Building2 className="h-3 w-3" />
-                    {jd.company}
+        {jdResults.length === 0 ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-600 font-medium">暂无搜索结果</p>
+              <p className="text-xs text-gray-400 mt-1">请输入搜索条件开始搜索</p>
+            </div>
+          </div>
+        ) : (
+          jdResults.map((jd) => (
+            <div
+              key={jd.id}
+              className="rounded-xl border border-blue-200 bg-white p-4 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-gray-900">{jd.title}</h3>
+                    {jd.hasReferral && (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 font-medium border border-green-200">
+                        内推
+                      </span>
+                    )}
+                    {jd.isRemote && (
+                      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700 font-medium border border-blue-200">
+                        远程
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {jd.location}
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                    <div className="flex items-center gap-1">
+                      <Building2 className="h-3.5 w-3.5 text-gray-400" />
+                      {jd.company}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3.5 w-3.5 text-gray-400" />
+                      {jd.location}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5 text-gray-400" />
+                      {jd.updatedDays}天前
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {jd.updatedDays}天前
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 text-yellow-400" />
-                    <span className="font-medium text-slate-200">{jd.fitScore}</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-500" />
+                      <span className="font-semibold text-gray-900">{jd.fitScore}%</span>
+                      <span className="text-xs text-gray-500">匹配度</span>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-1">
-                    {jd.keySkills.slice(0, 3).map((skill) => (
+
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {jd.keySkills.slice(0, 4).map((skill) => (
                       <span
                         key={skill}
-                        className="rounded bg-slate-700 px-2 py-0.5 text-xs text-slate-300"
+                        className="rounded-lg bg-blue-50 border border-blue-200 px-2 py-1 text-xs text-blue-700 font-medium"
                       >
                         {skill}
                       </span>
                     ))}
-                    {jd.keySkills.length > 3 && (
-                      <span className="text-xs text-slate-400">
-                        +{jd.keySkills.length - 3}
+                    {jd.keySkills.length > 4 && (
+                      <span className="text-xs text-gray-400 self-center">
+                        +{jd.keySkills.length - 4}
                       </span>
                     )}
                   </div>
+
+                  <div className="text-xs text-gray-500">
+                    来源：{jd.source}
+                  </div>
                 </div>
 
-                <div className="text-xs text-slate-500">
-                  来源：{jd.source}
+                <div className="flex flex-col gap-2 ml-4">
+                  <button
+                    onClick={() => handleCompare(jd)}
+                    className="rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 font-medium transition-all"
+                  >
+                    对比
+                  </button>
+                  <button
+                    onClick={() => handleSetTarget(jd)}
+                    className="rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-3 py-1.5 text-xs text-white hover:from-blue-600 hover:to-indigo-700 font-medium shadow-sm transition-all"
+                  >
+                    设为目标
+                  </button>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-2 ml-4">
-                <button
-                  onClick={() => handleCompare(jd)}
-                  className="rounded bg-white/10 px-3 py-1 text-xs text-slate-200 hover:bg-white/20"
-                >
-                  对比
-                </button>
-                <button
-                  onClick={() => handleSetTarget(jd)}
-                  className="rounded bg-sky-500 px-3 py-1 text-xs text-white hover:bg-sky-600"
-                >
-                  设为目标
-                </button>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Comparison Drawer */}

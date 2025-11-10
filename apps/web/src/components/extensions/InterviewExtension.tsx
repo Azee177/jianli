@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   MessageSquare, 
   Play, 
@@ -13,9 +13,11 @@ import {
   Video,
   FileText,
   Star,
-  TrendingUp
+  TrendingUp,
+  RefreshCw
 } from 'lucide-react';
 import { ExtensionProps } from '@/types/extensions';
+import { getInterviewQA } from '@/lib/fastapi-hooks';
 
 interface InterviewQuestion {
   id: string;
@@ -47,6 +49,8 @@ export function InterviewExtension({ context, onContextChange }: ExtensionProps)
   const [activeTab, setActiveTab] = useState<'questions' | 'mock' | 'history'>('questions');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showQuestionDetail, setShowQuestionDetail] = useState<string | null>(null);
+  const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Mock interview questions
   const mockQuestions: InterviewQuestion[] = [
@@ -144,8 +148,45 @@ export function InterviewExtension({ context, onContextChange }: ExtensionProps)
     }
   ];
 
-  const [questions, setQuestions] = useState(mockQuestions);
   const [interviews, setInterviews] = useState(mockInterviews);
+
+  // 当简历改变时，加载面试问答
+  useEffect(() => {
+    if (context.resume?.id) {
+      loadInterviewQuestions();
+    }
+  }, [context.resume?.id]);
+
+  const loadInterviewQuestions = async () => {
+    if (!context.resume?.id) return;
+
+    setIsLoading(true);
+    try {
+      const qaData = await getInterviewQA(context.resume.id);
+      
+      // 转换后端返回的问答为前端格式
+      const formattedQuestions: InterviewQuestion[] = (qaData.questions || qaData.qa_pairs || []).map((item: any, index: number) => ({
+        id: `${index + 1}`,
+        category: item.category || item.type || 'technical',
+        question: item.question || item.q,
+        difficulty: item.difficulty || item.level || 'medium',
+        keyPoints: item.key_points || item.tips || [],
+        commonMistakes: item.common_mistakes || item.pitfalls || [],
+        sampleAnswer: item.sample_answer || item.answer || item.a,
+        relatedJDRequirements: item.related_requirements || [],
+        status: 'not-answered',
+        practiceCount: 0
+      }));
+      
+      setQuestions(formattedQuestions.length > 0 ? formattedQuestions : mockQuestions);
+    } catch (error) {
+      console.error('Failed to load interview questions:', error);
+      // 使用Mock数据作为降级
+      setQuestions(mockQuestions);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredQuestions = questions.filter(q => 
     selectedCategory === 'all' || q.category === selectedCategory

@@ -3,18 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { Header } from '@/components/layout/Header';
-import { ExtensionLayout } from '@/components/layout/ExtensionLayout';
+import { TwoColumnLayout } from '@/components/layout/TwoColumnLayout';
 import {
   type ResumeEditorApi,
   type SelectionInfo,
 } from '@/components/layout/ResumeEditor';
 import { SelectionToolbar } from '@/components/editor/SelectionToolbar';
 import { AIExplanationDialog } from '@/components/editor/AIExplanationDialog';
-import {
-  defaultProgressSteps,
-  type ProgressStep,
-} from '@/components/layout/ProgressIndicator';
 import { DEFAULT_RESUME_CONTENT } from '@/lib/constants';
 import { deriveResumeContent } from '@/lib/resume-utils';
 import { AuthProvider } from '@/lib/auth/auth-context';
@@ -74,39 +69,6 @@ function EditorApp() {
 
   const handleEditorReady = useCallback((api: ResumeEditorApi | null) => {
     editorApiRef.current = api;
-  }, []);
-
-  // Progress steps for header
-  const progressSteps = useMemo<ProgressStep[]>(() => {
-    return defaultProgressSteps.map(step => {
-      if (step.id === 'upload') {
-        return { ...step, status: uploaded ? 'completed' : 'current' };
-      }
-      if (step.id === 'analysis') {
-        return {
-          ...step,
-          status: uploaded && target ? 'completed' : uploaded ? 'current' : 'pending',
-        };
-      }
-      if (step.id === 'matching') {
-        return {
-          ...step,
-          status: lockDims ? 'completed' : target ? 'current' : 'pending',
-        };
-      }
-      if (step.id === 'optimization') {
-        return {
-          ...step,
-          status: lockDims ? 'current' : 'pending',
-        };
-      }
-      return { ...step, status: step.status ?? 'pending' };
-    });
-  }, [uploaded, target, lockDims]);
-
-  const handleProgressSelect = useCallback((stepId: string) => {
-    // TODO: Handle progress step selection
-    console.log('Progress step selected:', stepId);
   }, []);
 
   // Selection toolbar handlers
@@ -186,16 +148,9 @@ function EditorApp() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen w-full bg-white text-gray-900 antialiased">
-        <Header
-          onMenuToggle={() => {}} // Not used in extension layout
-          isMenuOpen={false}
-          progressSteps={progressSteps}
-          onProgressSelect={handleProgressSelect}
-        />
-
+      <div className="h-screen w-full bg-white text-gray-900 antialiased overflow-hidden">
         <ErrorBoundary>
-          <ExtensionLayout
+          <TwoColumnLayout
             resumeContent={resumeContent}
             onResumeChange={handleResumeChange}
             onSelectionChange={handleSelectionChange}

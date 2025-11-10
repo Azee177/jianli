@@ -198,3 +198,150 @@ export async function getInterviewQA(resume_id: string): Promise<any> {
     pollTask();
   });
 }
+
+// 新增：分析简历并生成建议
+export async function analyzeSuggestions(resume_id: string, jd_id?: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/suggestions/analyze`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ 
+      resume_id,
+      jd_id 
+    }),
+  });
+  
+  return response.json();
+}
+
+// 新增：获取章节优化建议
+export async function getSectionSuggestions(resume_id: string, section: string, jd_id?: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/suggestions/section`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ 
+      resume_id,
+      section,
+      jd_id 
+    }),
+  });
+  
+  return response.json();
+}
+
+// 新增：优化文本
+export async function optimizeText(text: string, context?: string, jd_id?: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/suggestions/optimize-text`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ 
+      text,
+      context,
+      jd_id 
+    }),
+  });
+  
+  return response.json();
+}
+
+// 新增：JD多源搜索
+export async function searchJD(params: { 
+  company?: string;
+  title?: string;
+  city?: string;
+  limit?: number;
+}): Promise<any> {
+  const queryParams = new URLSearchParams();
+  if (params.company) queryParams.append('company', params.company);
+  if (params.title) queryParams.append('title', params.title);
+  if (params.city) queryParams.append('city', params.city);
+  if (params.limit) queryParams.append('limit', params.limit.toString());
+
+  const response = await fetch(`${API_BASE}/jd/search?${queryParams}`, {
+    method: "POST",
+    headers: getHeaders(),
+  });
+  
+  return response.json();
+}
+
+// 新增：设置目标岗位
+export async function setTarget(jd_id: string, user_id?: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/targets`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ 
+      jd_id,
+      user_id: user_id || 'demo-user'
+    }),
+  });
+  
+  return response.json();
+}
+
+// 新增：获取目标列表
+export async function getTargets(user_id?: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/targets?user_id=${user_id || 'demo-user'}`, {
+    headers: getHeaders(),
+  });
+  
+  return response.json();
+}
+
+// ==================== 通用对话API ====================
+
+export interface ChatMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
+export interface SendChatMessageParams {
+  message: string;
+  session_id?: string;
+  system_message?: string;
+  temperature?: number;
+  max_tokens?: number;
+  provider?: 'qwen' | 'deepseek' | 'openai';
+}
+
+export async function sendChatMessage(params: SendChatMessageParams): Promise<any> {
+  const response = await fetch(`${API_BASE}/chat/message`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(params),
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || '对话失败');
+  }
+  
+  return response.json();
+}
+
+export async function getChatHistory(session_id: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/chat/history`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ session_id }),
+  });
+  
+  return response.json();
+}
+
+export async function resetChatSession(session_id: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/chat/reset`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ session_id }),
+  });
+  
+  return response.json();
+}
+
+export async function listChatSessions(): Promise<any> {
+  const response = await fetch(`${API_BASE}/chat/sessions`, {
+    headers: getHeaders(),
+  });
+  
+  return response.json();
+}

@@ -1,9 +1,10 @@
 'use client';
 
-import { Menu, Sparkles, User, LogOut, Settings } from 'lucide-react';
+import { Menu, User, LogOut, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth/auth-context';
 import { SettingsPanel } from '@/components/settings/SettingsPanel';
+import { Logo } from '@/components/common/Logo';
 
 import type { ProgressStep } from './ProgressIndicator';
 
@@ -48,7 +49,7 @@ export function Header({
           </button>
 
           <div className="flex items-center gap-2 text-gray-900">
-            <Sparkles className="h-5 w-5 text-[#3330E4]" />
+            <Logo className="w-7 h-7" />
             <span className="font-semibold tracking-wide">Resume Copilot</span>
           </div>
         </div>

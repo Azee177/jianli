@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   GraduationCap, 
   Play, 
@@ -12,9 +12,11 @@ import {
   BookOpen,
   Target,
   Filter,
-  Search
+  Search,
+  RefreshCw
 } from 'lucide-react';
 import { ExtensionProps } from '@/types/extensions';
+import { getStudyPlan } from '@/lib/fastapi-hooks';
 
 interface LearningResource {
   id: string;
@@ -38,6 +40,8 @@ export function LearningExtension({ context, onContextChange }: ExtensionProps) 
   const [filter, setFilter] = useState<'all' | 'recommended' | 'bookmarked' | 'completed'>('recommended');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [resources, setResources] = useState<LearningResource[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Mock learning resources
   const mockResources: LearningResource[] = [
@@ -104,7 +108,47 @@ export function LearningExtension({ context, onContextChange }: ExtensionProps) 
     }
   ];
 
-  const [resources, setResources] = useState(mockResources);
+  // 当简历改变时，加载学习计划
+  useEffect(() => {
+    if (context.resume?.id) {
+      loadStudyPlan();
+    }
+  }, [context.resume?.id]);
+
+  const loadStudyPlan = async () => {
+    if (!context.resume?.id) return;
+
+    setIsLoading(true);
+    try {
+      const plan = await getStudyPlan(context.resume.id);
+      
+      // 转换后端返回的学习计划为前端格式
+      const formattedResources: LearningResource[] = (plan.resources || plan.topics || []).map((item: any, index: number) => ({
+        id: `${index + 1}`,
+        title: item.title || item.topic || item.name,
+        platform: item.platform || 'bilibili',
+        url: item.url || item.link || '#',
+        duration: item.duration || item.estimated_time || '未知',
+        difficulty: item.difficulty || item.level || 'intermediate',
+        rating: item.rating || 4.5,
+        views: item.views || '0',
+        author: item.author || item.instructor || '未知',
+        tags: item.tags || item.keywords || [],
+        relatedJDClauses: item.related_jd_clauses || item.requirements || [],
+        estimatedBenefit: item.benefit || item.match_improvement || 70,
+        status: 'not-started',
+        progress: 0
+      }));
+      
+      setResources(formattedResources.length > 0 ? formattedResources : mockResources);
+    } catch (error) {
+      console.error('Failed to load study plan:', error);
+      // 使用Mock数据作为降级
+      setResources(mockResources);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredResources = resources.filter(resource => {
     const matchesFilter = filter === 'all' || 

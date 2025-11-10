@@ -16,6 +16,7 @@ from .routes.export import create_export_router
 from .routes.uploads import create_upload_router
 from .routes.tasks import create_task_router
 from .routes.ws import create_ws_router
+from .routes.chat import create_chat_router
 
 from .services.resume_service import ResumeService
 from .services.jd_service import JDService
@@ -82,6 +83,7 @@ app.include_router(create_export_router(export_service))
 app.include_router(create_upload_router(upload_service))
 app.include_router(create_task_router(task_service))
 app.include_router(create_ws_router(websocket_service))
+app.include_router(create_chat_router(), prefix="/chat", tags=["chat"])  # 新增：通用对话路由
 
 # CORS配置
 allowed_origins = [

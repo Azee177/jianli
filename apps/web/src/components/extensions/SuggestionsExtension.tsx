@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Lightbulb, 
   TrendingUp, 
@@ -10,9 +10,11 @@ import {
   X, 
   Edit3,
   ArrowRight,
-  Clock
+  Clock,
+  RefreshCw
 } from 'lucide-react';
 import { ExtensionProps } from '@/types/extensions';
+import { analyzeSuggestions } from '@/lib/fastapi-hooks';
 
 interface Suggestion {
   id: string;
@@ -31,9 +33,55 @@ interface Suggestion {
 export function SuggestionsExtension({ context, onContextChange }: ExtensionProps) {
   const [filter, setFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [groupBy, setGroupBy] = useState<'priority' | 'section' | 'impact'>('priority');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock suggestions data
-  const mockSuggestions: Suggestion[] = [
+  // 当简历或目标改变时，自动分析建议
+  useEffect(() => {
+    if (context.resume?.id && context.target?.id) {
+      loadSuggestions();
+    }
+  }, [context.resume?.id, context.target?.id]);
+
+  const loadSuggestions = async () => {
+    if (!context.resume?.id) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await analyzeSuggestions(
+        context.resume.id,
+        context.target?.id
+      );
+      
+      // 转换后端返回的建议格式为前端格式
+      const formattedSuggestions: Suggestion[] = (result.suggestions || []).map((item: any, index: number) => ({
+        id: `${index + 1}`,
+        title: item.title || item.suggestion || '优化建议',
+        description: item.description || item.rationale || '',
+        impact: item.score || item.impact || 10,
+        section: item.section || '未分类',
+        type: item.type || 'rewrite',
+        priority: item.priority || (item.score > 12 ? 'high' : item.score > 7 ? 'medium' : 'low'),
+        jdClause: item.jd_clause || item.jdClause,
+        currentText: item.current_text || item.currentText,
+        suggestedText: item.suggested_text || item.suggestedText,
+        status: 'pending'
+      }));
+      
+      setSuggestions(formattedSuggestions);
+    } catch (error) {
+      console.error('Failed to load suggestions:', error);
+      // 使用Mock数据作为降级方案
+      setSuggestions(getMockSuggestions());
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mock suggestions data（作为降级方案）
+  const getMockSuggestions = (): Suggestion[] => [
     {
       id: '1',
       title: '量化项目成果',
@@ -85,8 +133,6 @@ export function SuggestionsExtension({ context, onContextChange }: ExtensionProp
     }
   ];
 
-  const [suggestions, setSuggestions] = useState(mockSuggestions);
-
   const filteredSuggestions = suggestions.filter(s => 
     filter === 'all' || s.priority === filter
   );
@@ -121,10 +167,10 @@ export function SuggestionsExtension({ context, onContextChange }: ExtensionProp
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-400 bg-red-500/20';
-      case 'medium': return 'text-yellow-400 bg-yellow-500/20';
-      case 'low': return 'text-green-400 bg-green-500/20';
-      default: return 'text-slate-400 bg-slate-500/20';
+      case 'high': return 'text-red-600 bg-red-50 border border-red-200';
+      case 'medium': return 'text-yellow-600 bg-yellow-50 border border-yellow-200';
+      case 'low': return 'text-green-600 bg-green-50 border border-green-200';
+      default: return 'text-gray-600 bg-gray-50 border border-gray-200';
     }
   };
 
@@ -138,22 +184,51 @@ export function SuggestionsExtension({ context, onContextChange }: ExtensionProp
     }
   };
 
+  // 如果没有简历或目标，显示提示
+  if (!context.resume) {
+    return (
+      <div className="flex h-full items-center justify-center p-8">
+        <div className="text-center">
+          <Lightbulb className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+          <p className="text-gray-600 font-medium mb-2">请先上传简历</p>
+          <p className="text-sm text-gray-400">上传简历后才能获取优化建议</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!context.target) {
+    return (
+      <div className="flex h-full items-center justify-center p-8">
+        <div className="text-center">
+          <Target className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+          <p className="text-gray-600 font-medium mb-2">请先设置目标岗位</p>
+          <p className="text-sm text-gray-400">设置目标岗位后系统将为您生成针对性优化建议</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="border-b border-white/10 p-4">
+      <div className="border-b border-blue-100 p-4 bg-white/50">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <h3 className="font-medium text-slate-100">建议队列</h3>
-            <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
+            <h3 className="font-semibold text-gray-900">建议队列</h3>
+            <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs text-white font-bold shadow-sm">
               {suggestions.filter(s => s.status === 'pending').length}
             </span>
           </div>
-          {context.target && (
-            <div className="text-xs text-slate-400">
-              基于 {context.target.company} JD
-            </div>
-          )}
+          
+          <button
+            onClick={loadSuggestions}
+            disabled={isLoading}
+            className="p-2 rounded-lg hover:bg-blue-100 text-blue-600 disabled:opacity-50 transition-all"
+            title="刷新建议"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
 
         {/* Filters */}
@@ -162,10 +237,10 @@ export function SuggestionsExtension({ context, onContextChange }: ExtensionProp
             <button
               key={f}
               onClick={() => setFilter(f as any)}
-              className={`rounded-lg px-3 py-1 text-xs transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all shadow-sm ${
                 filter === f
-                  ? 'bg-sky-500/20 text-sky-200'
-                  : 'bg-white/5 text-slate-400 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
+                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-blue-50'
               }`}
             >
               {f === 'all' ? '全部' : f === 'high' ? '高优先级' : f === 'medium' ? '中优先级' : '低优先级'}
@@ -174,76 +249,98 @@ export function SuggestionsExtension({ context, onContextChange }: ExtensionProp
         </div>
 
         {/* Group By */}
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <span>分组：</span>
+        <div className="flex items-center gap-2 text-xs text-gray-600">
+          <span className="font-medium">分组：</span>
           {['priority', 'section', 'impact'].map((g) => (
             <button
               key={g}
               onClick={() => setGroupBy(g as any)}
-              className={`hover:text-slate-200 ${groupBy === g ? 'text-sky-400' : ''}`}
+              className={`hover:text-blue-600 font-medium ${groupBy === g ? 'text-blue-600' : ''}`}
             >
               {g === 'priority' ? '优先级' : g === 'section' ? '部分' : '影响'}
             </button>
           ))}
         </div>
+        
+        {context.target && (
+          <div className="text-xs text-gray-500 mt-2">
+            基于 {context.target.company} JD
+          </div>
+        )}
       </div>
 
       {/* Suggestions List */}
       <div className="flex-1 overflow-auto custom-scrollbar p-4 space-y-4">
-        {Object.entries(groupedSuggestions).map(([group, groupSuggestions]) => (
-          <div key={group}>
-            <h4 className="font-medium text-slate-300 mb-3 capitalize">
-              {group.replace('-', ' ')}
-            </h4>
-            <div className="space-y-3">
-              {groupSuggestions.map((suggestion) => (
-                <div
-                  key={suggestion.id}
-                  className={`rounded-lg border p-4 transition-all ${
-                    suggestion.status === 'applied'
-                      ? 'border-green-500/30 bg-green-500/10'
-                      : suggestion.status === 'dismissed'
-                      ? 'border-slate-500/30 bg-slate-500/10 opacity-60'
-                      : 'border-white/10 bg-white/5 hover:bg-white/10'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      {getTypeIcon(suggestion.type)}
-                      <h5 className="font-medium text-slate-100">{suggestion.title}</h5>
-                      <span className={`rounded px-2 py-0.5 text-xs ${getPriorityColor(suggestion.priority)}`}>
-                        +{suggestion.impact}分
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3" />
+              <p className="text-sm text-gray-600">正在生成优化建议...</p>
+            </div>
+          </div>
+        ) : suggestions.length === 0 ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <Lightbulb className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-600 font-medium">暂无建议</p>
+              <p className="text-xs text-gray-400 mt-1">点击刷新按钮重新生成</p>
+            </div>
+          </div>
+        ) : (
+          Object.entries(groupedSuggestions).map(([group, groupSuggestions]) => (
+            <div key={group}>
+              <h4 className="font-semibold text-blue-900 mb-3 capitalize text-sm">
+                {group.replace('-', ' ')}
+              </h4>
+              <div className="space-y-3">
+                {groupSuggestions.map((suggestion) => (
+                  <div
+                    key={suggestion.id}
+                    className={`rounded-xl border p-4 transition-all shadow-sm ${
+                      suggestion.status === 'applied'
+                        ? 'border-green-300 bg-green-50'
+                        : suggestion.status === 'dismissed'
+                        ? 'border-gray-300 bg-gray-50 opacity-60'
+                        : 'border-blue-200 bg-white hover:shadow-md hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="text-blue-600">{getTypeIcon(suggestion.type)}</div>
+                        <h5 className="font-semibold text-gray-900">{suggestion.title}</h5>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${getPriorityColor(suggestion.priority)}`}>
+                          +{suggestion.impact}分
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
                       {suggestion.status === 'applied' && (
-                        <Check className="h-4 w-4 text-green-400" />
+                        <Check className="h-5 w-5 text-green-500" />
                       )}
                       {suggestion.status === 'dismissed' && (
-                        <X className="h-4 w-4 text-slate-400" />
+                        <X className="h-5 w-5 text-gray-400" />
                       )}
                     </div>
                   </div>
 
-                  <p className="text-sm text-slate-300 mb-3">{suggestion.description}</p>
+                  <p className="text-sm text-gray-700 mb-3 leading-relaxed">{suggestion.description}</p>
 
                   {suggestion.jdClause && (
-                    <div className="rounded bg-blue-500/10 p-2 mb-3">
-                      <div className="text-xs text-blue-300 mb-1">JD要求</div>
-                      <div className="text-sm text-blue-200">{suggestion.jdClause}</div>
+                    <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 mb-3">
+                      <div className="text-xs text-blue-600 font-medium mb-1">📋 JD要求</div>
+                      <div className="text-sm text-blue-800">{suggestion.jdClause}</div>
                     </div>
                   )}
 
                   {suggestion.currentText && (
                     <div className="space-y-2 mb-3">
-                      <div className="rounded bg-red-500/10 p-2">
-                        <div className="text-xs text-red-300 mb-1">当前</div>
-                        <div className="text-sm text-red-200">{suggestion.currentText}</div>
+                      <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+                        <div className="text-xs text-red-600 font-medium mb-1">❌ 当前</div>
+                        <div className="text-sm text-red-700">{suggestion.currentText}</div>
                       </div>
                       {suggestion.suggestedText && (
-                        <div className="rounded bg-green-500/10 p-2">
-                          <div className="text-xs text-green-300 mb-1">建议</div>
-                          <div className="text-sm text-green-200">{suggestion.suggestedText}</div>
+                        <div className="rounded-lg bg-green-50 border border-green-200 p-3">
+                          <div className="text-xs text-green-600 font-medium mb-1">✅ 建议</div>
+                          <div className="text-sm text-green-700 font-medium">{suggestion.suggestedText}</div>
                         </div>
                       )}
                     </div>
@@ -253,46 +350,37 @@ export function SuggestionsExtension({ context, onContextChange }: ExtensionProp
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleApplySuggestion(suggestion.id)}
-                        className="flex-1 rounded bg-sky-500 px-3 py-2 text-sm text-white hover:bg-sky-600"
+                        className="flex-1 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all"
                       >
                         一键应用
                       </button>
                       <button
                         onClick={() => handleGenerateVariants(suggestion.id)}
-                        className="rounded bg-white/10 px-3 py-2 text-sm text-slate-200 hover:bg-white/20"
+                        className="rounded-lg bg-white border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-all"
                       >
                         生成变体
                       </button>
                       <button
                         onClick={() => handleDismissSuggestion(suggestion.id)}
-                        className="rounded bg-white/10 px-3 py-2 text-sm text-slate-400 hover:bg-white/20"
+                        className="rounded-lg bg-white border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-all"
                       >
                         忽略
                       </button>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
-                    <span className="text-xs text-slate-400">{suggestion.section}</span>
-                    <div className="flex items-center gap-1 text-xs text-slate-400">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
+                    <span className="text-xs text-gray-500 font-medium">{suggestion.section}</span>
+                    <div className="flex items-center gap-1 text-xs text-gray-400">
                       <Clock className="h-3 w-3" />
-                      <span>2分钟前</span>
+                      <span>刚刚</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        ))}
-
-        {filteredSuggestions.length === 0 && (
-          <div className="text-center py-12">
-            <Lightbulb className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-            <h3 className="font-medium text-slate-300 mb-2">暂无建议</h3>
-            <p className="text-sm text-slate-400">
-              {context.target ? '当前简历与JD匹配度很高！' : '请先选择目标岗位以获取个性化建议'}
-            </p>
-          </div>
+        ))
         )}
       </div>
     </div>
